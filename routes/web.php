@@ -2,6 +2,8 @@
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PatternsController;
+use App\Http\Controllers\WordListController;
 use Inertia\Inertia;
 
 /*
@@ -32,4 +34,8 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+    Route::any('/patterns/show', [PatternsController::class, 'show'])
+    ->name('patterns.show');
+    Route::post('/word-list/store', [WordListController::class, 'store'])
+    ->name('word-list.store');
 });

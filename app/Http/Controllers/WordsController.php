@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Words;
+use App\Models\Word;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
-class WordsController extends Controller
+class WordController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,15 +35,15 @@ class WordsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Words $words)
+    public function show(Word $word)
     {
-        //
+  
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Words $words)
+    public function edit(Word $word)
     {
         //
     }
@@ -50,7 +51,7 @@ class WordsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Words $words)
+    public function update(Request $request, Word $word)
     {
         //
     }
@@ -58,7 +59,7 @@ class WordsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Words $words)
+    public function destroy(Word $word)
     {
         //
     }

@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('words_patterns', function (Blueprint $table) {
+        Schema::create('word_list_words', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('word_id')->constrained('words', 'id');
-            $table->foreignId('pattern_id');
+            $table->foreignId('word_list_id')->constrained('word_lists')->onDelete('cascade');
+            $table->foreignId('word_id')->constrained('words')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('words_patterns');
+        Schema::dropIfExists('word_list_words');
     }
 };

@@ -94,3 +94,12 @@ export interface TeamInvitation {
   created_at: DateTime;
   updated_at: DateTime;
 }
+export interface Word {
+  word_id: number;
+  word: string;
+}
+
+export interface WordPattern {
+  pattern_name: string;
+  words: Word[];
+}
