@@ -11,15 +11,9 @@ class Pattern extends Model
 
     protected $fillable = ['pattern_name'];
 
-    protected $hidden = ['pivot'];
-
     public function words()
     {
-        return $this->belongsToMany(Word::class, 'words_patterns', 'pattern_id', 'word_id')->select(['word_id', 'word']);;
+        return $this->belongsTo(Word::class);
     }
 
-    public static function wordList(array $list){
-        return $this->belongsToMany(Word::class)
-                ->wherePivotIn('pattern_name', $list);
-    }
 }

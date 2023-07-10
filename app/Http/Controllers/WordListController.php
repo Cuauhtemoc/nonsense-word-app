@@ -32,12 +32,13 @@ class WordListController extends Controller
     {
        
         $validatedData = $request->validateWithBag("wordList", [
-         
+            'name' => ['required', 'string'],
             'wordPatterns' => ['required', "array"],
         ]);
 
         $wordList = new WordList();
-        $wordList->name = "test";
+        $wordList->name = $validatedData['name'];
+        $wordList->user_id = $request->user()->id;
         $wordList->save();
 
         $patternData = $validatedData["wordPatterns"];
@@ -45,19 +46,22 @@ class WordListController extends Controller
        
         foreach ($patternData as $pattern) {
             $filteredArray = array_column($pattern['words'], 'word_id');
-            \Log::debug($filteredArray);
             $wordList->words()->attach($filteredArray); 
 
         }
-    
+        return back()->with(['wordPatterns' => $patternData]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(WordList $wordList)
+    public function show(Request $request)
     {
-       
+       $wordLists = $request->user()->wordLists()->get();
+
+       return Inertia::render('Dashboard', [
+            'wordLists' => $wordLists
+       ]);
     }
 
     /**

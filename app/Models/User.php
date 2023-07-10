@@ -10,6 +10,9 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\WordList;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class User extends Authenticatable
 {
@@ -59,5 +62,12 @@ class User extends Authenticatable
         'profile_photo_url',
    
     ];
- 
+    /**
+     *  The word lists this user has saved 
+     * * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+     public function wordLists() : HasMany {
+        return $this->hasMany(WordList::class)->with('words');
+     }
+    
 }

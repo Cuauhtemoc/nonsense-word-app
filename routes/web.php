@@ -31,11 +31,12 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [WordListController::class, 'show'])
+    ->name('dashboard');
     Route::any('/patterns/show', [PatternsController::class, 'show'])
     ->name('patterns.show');
     Route::post('/word-list/store', [WordListController::class, 'store'])
     ->name('word-list.store');
+    // Route::get('/word-list/show', [WordListController::class, 'show'])
+    // ->name('word-list.show');
 });

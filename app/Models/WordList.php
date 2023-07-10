@@ -13,6 +13,7 @@ class WordList extends Model
     
     public function words()
     {
-        return $this->belongsToMany(Word::class, 'word_list_words', 'word_list_id', "word_id");
+        return $this->belongsToMany(Word::class, 'word_list_words', 'word_list_id', "word_id")->with('patterns');
     }
+   
 }

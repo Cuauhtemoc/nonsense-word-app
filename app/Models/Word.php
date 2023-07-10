@@ -10,11 +10,10 @@ class Word extends Model
     use HasFactory;
     
     protected $fillable = ['word'];
-    protected $hidden = ['pivot'];
 
-    public function patterns()
+    public function pattern()
     {
-        return $this->belongsToMany(Pattern::class, 'words_patterns', 'word_id', 'pattern_id');
+        return $this->hasOne(Pattern::class);
     }
     public function wordLists()
     {

@@ -1,8 +1,10 @@
 import ActionMessage from "@/Components/ActionMessage";
 import Checkbox from "@/Components/Checkbox";
 import FormSection from "@/Components/FormSection";
+import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
 import WordListPDF from "@/Components/WordListPDF";
 import WordListTable from "@/Components/WordListTable";
 import useRoute from "@/Hooks/useRoute";
@@ -20,29 +22,28 @@ interface Props {
 }
 
 
-export default function CreateWordListForm({availablePatterns, wordPatterns} : Props){
+export default function form({availablePatterns, wordPatterns} : Props){
     
     const route = useRoute();
     const page = useTypedPage();
-  
-    const createWordListForm = useForm("Create/List",{
+    const [listName, setListName] = useState('');
+
+    const form = useForm("Create/List",{
       patterns: availablePatterns,
-    });
-    const storeWordListForm = useForm("Store/List", {
       name: '',
-      wordPatterns: wordPatterns,
     });
     
     function createList(): void{
-      createWordListForm.post(route("patterns.show"), {
+      form.post(route("patterns.show"), {
           preserveState : true,
-          onSuccess: () => storeWordListForm.setData('wordPatterns', wordPatterns)
         });
     }
     function storeList() : void{   
-      storeWordListForm.post(route("word-list.store"), {
-          preserveState : true,
-        });
+      let data = {
+        name: form.data.name,
+        wordPatterns: JSON.parse(JSON.stringify(wordPatterns))
+      };
+      router.post('/word-list/store', data);
     }
    return(
     <>
@@ -52,67 +53,86 @@ export default function CreateWordListForm({availablePatterns, wordPatterns} : P
         description={'Create a new word list from the available patterns.'}
         renderActions={() => (
           <>
-            <ActionMessage on={createWordListForm.recentlySuccessful} className="mr-3">
+            <ActionMessage on={form.recentlySuccessful} className="mr-3">
               Done
             </ActionMessage>
-
-            <div onClick={() => createList()} className={classNames('diabled:opacity-25 inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'invisible': createWordListForm.processing || storeWordListForm.processing })}>
-              {wordPatterns ? "Create New List":"Create List"}
-            </div>
-            {wordPatterns && <PDFDownloadLink   className='mx-2' document={<WordListPDF wordPatterns={wordPatterns} />} fileName="wordlist">
-            {({loading}) => (loading ? <PrimaryButton disabled={true}>Loading Document...</PrimaryButton> : <PrimaryButton disabled={createWordListForm.processing}>Download PDF</PrimaryButton> )}
-            </PDFDownloadLink>}
-
+   
             {wordPatterns && <PrimaryButton
-              className={classNames({ 'opacity-25': storeWordListForm.processing })}
-              disabled={createWordListForm.processing}
+              className={classNames({ 'opacity-25 pointer-events-none': form.processing || !form.data.name}
+              )}
+              disabled={!form.data.name}
             >
               Save List
             </PrimaryButton>}
+
+            {wordPatterns && <PDFDownloadLink  className={classNames('mx-3', { 'opacity-40 pointer-events-none': form.processing})}document={<WordListPDF wordPatterns={wordPatterns} />} fileName="wordlist">
+            {({loading}) => (<div className={classNames('inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'pointer-events-none': form.processing || loading})}>Download PDF</div> )}
+            </PDFDownloadLink>}              
+            <div onClick={() => createList()} className={classNames('cursor-pointer inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'opacity-25 pointer-events-none': form.processing })}>
+              {wordPatterns ? "Create New List":"Create List"}
+            </div>
           </>
         )}
       >
-          <div className="col-span-6">
-              <InputLabel htmlFor="wordlist">Patterns</InputLabel>
-              <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {availablePatterns.map(pattern => 
-                  <div key={pattern}>
-                      <label  className="flex items-center">
-                          <Checkbox 
-                              value={pattern}
-                              checked={createWordListForm.data.patterns.includes(
-                              pattern,
-                              )}
-                              onChange={e => {
-                              if (
-                                  createWordListForm.data.patterns.includes(
-                                  e.currentTarget.value,
-                                  )
-                              ) {
-                                  createWordListForm.setData(
-                                  'patterns',
-                                  createWordListForm.data.patterns.filter(
-                                      p => p !== e.currentTarget.value,
-                                  ),
-                                  );
-                              } else {
-                                  createWordListForm.setData('patterns', [
-                                  e.currentTarget.value,
-                                  ...createWordListForm.data.patterns,
-                                  ]);
-                              }
-                              }}
-                          />
-                          <span className="ml-2 mr-4 text-sm text-gray-600 dark:text-gray-400">{pattern} </span>
-                      
-                      </label>
-                  </div>
-                  )
-              }
-              
-              </div>
-          </div>
+        <div className="col-span-6">
+            <InputLabel htmlFor="wordlist">Patterns</InputLabel>
+            <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {availablePatterns.map(pattern => 
+                <div key={pattern}>
+                    <label  className="flex items-center">
+                        <Checkbox 
+                            value={pattern}
+                            checked={form.data.patterns.includes(
+                            pattern,
+                            )}
+                            onChange={e => {
+                            if (
+                                form.data.patterns.includes(
+                                e.currentTarget.value,
+                                )
+                            ) {
+                                form.setData(
+                                'patterns',
+                                form.data.patterns.filter(
+                                    p => p !== e.currentTarget.value,
+                                ),
+                                );
+                            } else {
+                                form.setData('patterns', [
+                                e.currentTarget.value,
+                                ...form.data.patterns,
+                                ]);
+                            }
+                            }}
+                        />
+                        <span className="ml-2 mr-4 text-sm text-gray-600 dark:text-gray-400">{pattern} </span>
+                    
+                    </label>
+                </div>
+                )
+            }
+            
+            </div>
+        </div>
       </FormSection>
+      {wordPatterns && 
+        <div className="col-span-6 sm:col-span-4">
+          <InputLabel htmlFor="name">Word List Name</InputLabel>
+            <TextInput
+              id="name"
+              type="text"
+              className="mt-1 block w-full"
+              value={form.data.name}
+              onChange={e =>
+                form.setData('name', e.currentTarget.value)
+              }
+              autoFocus
+            />
+            <InputError
+              message={form.errors.name}
+              className="mt-2"
+            />
+          </div>}
       {wordPatterns && <WordListTable wordPatterns={wordPatterns}/>}
       
     </>

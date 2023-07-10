@@ -103,3 +103,7 @@ export interface WordPattern {
   pattern_name: string;
   words: Word[];
 }
+ export interface WordLIst {
+    name: string,
+    wordPatterns : WordPattern[]
+ }

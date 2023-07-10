@@ -107,6 +107,21 @@ export default function AppLayout({
                       )}
                     >
                       <div className="w-60">
+                        {/* <!-- List Management --> */}
+                        
+                            <div className="block px-4 py-2 text-xs text-gray-400">
+                              Create Team
+                            </div>
+
+                            {/* <!-- Team Settings --> */}
+                            <DropdownLink
+                              href={route('patterns.show')}
+                            >
+                              Create New List
+                            </DropdownLink>
+
+                      </div>
+                      <div className="w-60">
                         {/* <!-- Team Management --> */}
                         {page.props.jetstream.hasTeamFeatures ? (
                           <>
