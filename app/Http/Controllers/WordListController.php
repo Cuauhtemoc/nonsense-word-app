@@ -33,23 +33,19 @@ class WordListController extends Controller
        
         $validatedData = $request->validateWithBag("wordList", [
             'name' => ['required', 'string'],
-            'wordPatterns' => ['required', "array"],
+            'words' => ['required', "array"],
         ]);
 
         $wordList = new WordList();
         $wordList->name = $validatedData['name'];
         $wordList->user_id = $request->user()->id;
         $wordList->save();
-
-        $patternData = $validatedData["wordPatterns"];
-
        
-        foreach ($patternData as $pattern) {
-            $filteredArray = array_column($pattern['words'], 'word_id');
-            $wordList->words()->attach($filteredArray); 
+        $wordData = $validatedData["words"];
+        $filteredArray = array_column($wordData, 'id');
+        $wordList->words()->attach($filteredArray); 
 
-        }
-        return back()->with(['wordPatterns' => $patternData]);
+        return back()->with('message', 'My message');
     }
 
     /**

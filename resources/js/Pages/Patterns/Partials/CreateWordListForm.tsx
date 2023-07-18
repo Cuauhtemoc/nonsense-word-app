@@ -9,27 +9,27 @@ import WordListPDF from "@/Components/WordListPDF";
 import WordListTable from "@/Components/WordListTable";
 import useRoute from "@/Hooks/useRoute";
 import useTypedPage from "@/Hooks/useTypedPage";
-import { WordPattern } from "@/types";
+import { GeneralPattern, WordLIst, WordPattern } from "@/types";
 import { router, useForm } from "@inertiajs/react";
-import { InertiaFormProps } from "@inertiajs/react/types/useForm";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import classNames from "classnames";
 import React, { useState } from "react";
 
 interface Props {
-    availablePatterns: string[]
-    wordPatterns: WordPattern[]
+    availablePatterns: GeneralPattern[]
+    wordList: WordLIst
 }
 
 
-export default function form({availablePatterns, wordPatterns} : Props){
-    
+export default function form({availablePatterns, wordList} : Props){
+  
     const route = useRoute();
     const page = useTypedPage();
-    const [listName, setListName] = useState('');
+    console.log(page.props.errors);
+    const patterns : string[] = [];
 
     const form = useForm("Create/List",{
-      patterns: availablePatterns,
+      patterns: patterns,
       name: '',
     });
     
@@ -41,7 +41,7 @@ export default function form({availablePatterns, wordPatterns} : Props){
     function storeList() : void{   
       let data = {
         name: form.data.name,
-        wordPatterns: JSON.parse(JSON.stringify(wordPatterns))
+        words: JSON.parse(JSON.stringify(wordList.words))
       };
       router.post('/word-list/store', data);
     }
@@ -57,7 +57,7 @@ export default function form({availablePatterns, wordPatterns} : Props){
               Done
             </ActionMessage>
    
-            {wordPatterns && <PrimaryButton
+            {wordList && <PrimaryButton
               className={classNames({ 'opacity-25 pointer-events-none': form.processing || !form.data.name}
               )}
               disabled={!form.data.name}
@@ -65,11 +65,11 @@ export default function form({availablePatterns, wordPatterns} : Props){
               Save List
             </PrimaryButton>}
 
-            {wordPatterns && <PDFDownloadLink  className={classNames('mx-3', { 'opacity-40 pointer-events-none': form.processing})}document={<WordListPDF wordPatterns={wordPatterns} />} fileName="wordlist">
+            {wordList && <PDFDownloadLink  className={classNames('mx-3', { 'opacity-40 pointer-events-none': form.processing})}document={<WordListPDF wordList={wordList} />} fileName="wordlist">
             {({loading}) => (<div className={classNames('inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'pointer-events-none': form.processing || loading})}>Download PDF</div> )}
             </PDFDownloadLink>}              
-            <div onClick={() => createList()} className={classNames('cursor-pointer inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'opacity-25 pointer-events-none': form.processing })}>
-              {wordPatterns ? "Create New List":"Create List"}
+            <div onClick={() => createList()} className={classNames('cursor-pointer inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'opacity-25 pointer-events-none': form.processing || form.data.patterns.length == 0 })}>
+              {wordList ? "Create New List":"Create List"}
             </div>
           </>
         )}
@@ -77,37 +77,27 @@ export default function form({availablePatterns, wordPatterns} : Props){
         <div className="col-span-6">
             <InputLabel htmlFor="wordlist">Patterns</InputLabel>
             <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {availablePatterns.map(pattern => 
-                <div key={pattern}>
-                    <label  className="flex items-center">
-                        <Checkbox 
-                            value={pattern}
-                            checked={form.data.patterns.includes(
-                            pattern,
-                            )}
-                            onChange={e => {
-                            if (
-                                form.data.patterns.includes(
-                                e.currentTarget.value,
-                                )
-                            ) {
-                                form.setData(
-                                'patterns',
-                                form.data.patterns.filter(
-                                    p => p !== e.currentTarget.value,
-                                ),
-                                );
-                            } else {
-                                form.setData('patterns', [
-                                e.currentTarget.value,
-                                ...form.data.patterns,
-                                ]);
-                            }
-                            }}
-                        />
-                        <span className="ml-2 mr-4 text-sm text-gray-600 dark:text-gray-400">{pattern} </span>
+                {availablePatterns.map(pattern =>  
+                <div key={pattern.general_pattern_name}>
+                    <span className="ml-2 mr-4 text-md text-black-600 dark:text-gray-400">{pattern.general_pattern_name} </span> 
+                    {pattern.patterns.map( p =>
+                       <label key={p.id} className="flex items-center">
+                       <Checkbox
+                         value={p.id.toString()} // Use the pattern ID as the checkbox value
+                         checked={form.data.patterns.includes(p.id.toString())} // Check if the pattern ID is in the selected patterns array
+                         onChange={e => {
+                           const patternId = e.currentTarget.value;
+                           if (form.data.patterns.includes(patternId)) {
+                             form.setData('patterns', form.data.patterns.filter(p => p !== patternId));
+                           } else {
+                             form.setData('patterns', [patternId, ...form.data.patterns]);
+                           }
+                         }}
+                       />
+                      <span className="ml-2 mr-4 text-sm text-gray-600 dark:text-gray-400">{p.pattern_name} </span>
                     
-                    </label>
+                    </label>)}
+                  
                 </div>
                 )
             }
@@ -115,7 +105,7 @@ export default function form({availablePatterns, wordPatterns} : Props){
             </div>
         </div>
       </FormSection>
-      {wordPatterns && 
+      {wordList && 
         <div className="col-span-6 sm:col-span-4">
           <InputLabel htmlFor="name">Word List Name</InputLabel>
             <TextInput
@@ -133,7 +123,7 @@ export default function form({availablePatterns, wordPatterns} : Props){
               className="mt-2"
             />
           </div>}
-      {wordPatterns && <WordListTable wordPatterns={wordPatterns}/>}
+      {wordList && <WordListTable wordList={wordList}/>}
       
     </>
 

@@ -15,5 +15,14 @@ class Pattern extends Model
     {
         return $this->belongsTo(Word::class);
     }
+    /**
+     * Get the General Pattern that owns the Pattern
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function generalPattern(): BelongsTo
+    {
+        return $this->belongsTo(GeneralPattern::class);
+    }
 
 }

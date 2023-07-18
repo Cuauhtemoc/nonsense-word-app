@@ -98,12 +98,16 @@ export interface Word {
   word_id: number;
   word: string;
 }
-
+export interface GeneralPattern {
+  general_pattern_name : string;
+  patterns : WordPattern[]
+}
 export interface WordPattern {
   pattern_name: string;
-  words: Word[];
+  id: number;
+  words: Word[]
 }
  export interface WordLIst {
-    name: string,
-    wordPatterns : WordPattern[]
+    name: string;
+    words : Word[]
  }

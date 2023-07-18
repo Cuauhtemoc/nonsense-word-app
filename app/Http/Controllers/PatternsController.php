@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GeneralPattern;
+use App\Models\Word;
 use App\Models\Pattern;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -39,29 +41,29 @@ class PatternsController extends Controller
     {
    
         if($request->has("patterns")){
-            $wordList = array();
+            $allWords = [];
             $patternData = $request->input("patterns");
             foreach ($patternData as $pattern) {
                 
-                $p = Pattern::where('pattern_name', '=', $pattern)->firstOrFail();  
-                $words = $p->words()->inRandomOrder()->limit(10)->get();
-
-                array_push($wordList,[
-                    "pattern_name" => $pattern,
-                    "words" => $words
-                ] );
+                $words = Word::where('pattern_id', '=', $pattern)->inRandomOrder()->limit(10)->get();  
+                $allWords = array_merge($allWords, $words->toArray());
             
             }
+            shuffle($allWords);
+
             return Inertia::render('Patterns/Show', 
             [
-                "availablePatterns" => Pattern::all()->pluck("pattern_name"),
-                'wordPatterns' => $wordList
+                "availablePatterns" => GeneralPattern::with('patterns')->get(),
+                'wordList' => [
+                    "name" => "",
+                    "words" => $allWords
+                ]
             ]);
         }
         
         return Inertia::render('Patterns/Show', 
         [
-            "availablePatterns" => Pattern::all()->pluck("pattern_name"),
+            "availablePatterns" => GeneralPattern::with('patterns')->get()
         ]);
        
        
