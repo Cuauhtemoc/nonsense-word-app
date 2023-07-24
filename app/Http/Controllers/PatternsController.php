@@ -43,9 +43,18 @@ class PatternsController extends Controller
         if($request->has("patterns")){
             $allWords = [];
             $patternData = $request->input("patterns");
+            $patternCount = count($patternData);
+            $totalWords = $request->input('totalWords');
+
+            $numberOfWordsPerPattern = floor($totalWords / $patternCount);
+            $remainingWords = $totalWords % $patternCount;
+
             foreach ($patternData as $pattern) {
-                
-                $words = Word::where('pattern_id', '=', $pattern)->inRandomOrder()->limit(10)->get();  
+
+                $wordsLimit = $numberOfWordsPerPattern + ($remainingWords > 0 ? 1 : 0);
+                $remainingWords--;
+
+                $words = Word::where('pattern_id', '=', $pattern)->inRandomOrder()->limit($wordsLimit)->get();  
                 $allWords = array_merge($allWords, $words->toArray());
             
             }
@@ -65,9 +74,6 @@ class PatternsController extends Controller
         [
             "availablePatterns" => GeneralPattern::with('patterns')->get()
         ]);
-       
-       
-        
     }
 
     /**

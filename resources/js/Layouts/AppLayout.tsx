@@ -110,10 +110,10 @@ export default function AppLayout({
                         {/* <!-- List Management --> */}
                         
                             <div className="block px-4 py-2 text-xs text-gray-400">
-                              Create Team
+                              Manage Lists
                             </div>
 
-                            {/* <!-- Team Settings --> */}
+                            {/* <!-- Create A New List --> */}
                             <DropdownLink
                               href={route('patterns.show')}
                             >
@@ -144,7 +144,6 @@ export default function AppLayout({
                               </DropdownLink>
                             ) : null}
 
-                            <div className="border-t border-gray-200 dark:border-gray-600" />
 
                             {/* <!-- Team Switcher --> */}
                             <div className="block px-4 py-2 text-xs text-gray-400">
