@@ -1,5 +1,5 @@
 import React from 'react';
-import WordListTable from './WordListTable';
+import WordListTable from './WordListGrid';
 import { WordLIst, WordPattern } from '@/types';
 
 interface Props {

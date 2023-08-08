@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PatternsController;
 use App\Http\Controllers\WordListController;
+use App\Http\Controllers\WordsController;
 use Inertia\Inertia;
 
 /*
@@ -39,4 +40,5 @@ Route::middleware([
     ->name('word-list.store');
     // Route::get('/word-list/show', [WordListController::class, 'show'])
     // ->name('word-list.show');
+    Route::get('refresh/{word}', [WordsController::class, 'refresh'])->name('word.refresh');
 });

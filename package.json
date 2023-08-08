@@ -10,7 +10,7 @@
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",
     "@types/lodash": "^4.14.195",
-    "@types/react": "^18.2.7",
+    "@types/react": "^18.2.18",
     "@types/react-dom": "^18.2.4",
     "@types/ziggy-js": "^1.3.2",
     "@vitejs/plugin-react": "^2.2.0",
@@ -21,10 +21,13 @@
     "postcss": "^8.4.24",
     "prettier": "^2.8.8",
     "tailwindcss": "^3.3.2",
-    "typescript": "^4.9.5",
+    "tsdef": "0.0.14",
+    "typescript": "^5.1.6",
     "vite": "^3.2.7"
   },
   "dependencies": {
+    "@aperturerobotics/chonky": "^0.2.6",
+    "@aperturerobotics/chonky-icon-fontawesome": "^0.2.2",
     "@headlessui/react": "^1.7.14",
     "@inertiajs/core": "^1.0.7",
     "@inertiajs/react": "^1.0.7",

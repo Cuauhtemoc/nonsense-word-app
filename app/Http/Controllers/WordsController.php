@@ -6,7 +6,7 @@ use App\Models\Word;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class WordController extends Controller
+class WordsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -37,9 +37,17 @@ class WordController extends Controller
      */
     public function show(Word $word)
     {
-  
-    }
 
+    }
+    /**
+     * Get a new word.
+     */
+    public function refresh(Word $word)
+    {      
+            $newWord = Word::where('pattern_id', $word->pattern_id)->where('id','!=', $word->id )->inRandomOrder()->first();
+
+            return response()->json(['word' => $newWord]);
+    }
     /**
      * Show the form for editing the specified resource.
      */

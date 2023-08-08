@@ -6,9 +6,14 @@ import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { RouteContext } from '@/Hooks/useRoute';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { setChonkyDefaults } from '@aperturerobotics/chonky';
+import { ChonkyIconFA } from '@aperturerobotics/chonky-icon-fontawesome';
+
 
 const appName =
   window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
+
+setChonkyDefaults({iconComponent : ChonkyIconFA});
 
 createInertiaApp({
   title: title => `${title} - ${appName}`,
@@ -22,6 +27,7 @@ createInertiaApp({
     ),
   setup({ el, App, props }) {
     const root = createRoot(el);
+
     return root.render(
       <RouteContext.Provider value={(window as any).route}>
         <App {...props} />

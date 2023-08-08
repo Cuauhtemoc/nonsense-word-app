@@ -95,7 +95,7 @@ export interface TeamInvitation {
   updated_at: DateTime;
 }
 export interface Word {
-  word_id: number;
+  id: number;
   word: string;
 }
 export interface GeneralPattern {

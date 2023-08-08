@@ -1,8 +1,8 @@
 import React from 'react';
-import Welcome from '@/Components/Welcome';
 import AppLayout from '@/Layouts/AppLayout';
-import SavedWordList from '@/Components/SavedWordList';
 import { WordLIst } from '@/types';
+import { VFSBrowser } from '@/Components/VFSBrowser';
+
 
 interface Props {
   wordLists : WordLIst[]
@@ -20,8 +20,7 @@ export default function Dashboard({wordLists} : Props) {
       <div className="py-12">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-            {wordLists && wordLists.map( list => <SavedWordList key={list.name} list={list}/>)}
-            
+            <VFSBrowser instanceId={'storyName'} />
           </div>
         </div>
       </div>

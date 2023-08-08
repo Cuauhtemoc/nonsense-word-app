@@ -7,7 +7,7 @@ import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import WordListPDF from "@/Components/WordListPDF";
-import WordListTable from "@/Components/WordListTable";
+import WordListTable from "@/Components/WordListGrid";
 import useRoute from "@/Hooks/useRoute";
 import useTypedPage from "@/Hooks/useTypedPage";
 import { GeneralPattern, WordLIst, WordPattern } from "@/types";
@@ -27,16 +27,16 @@ export default function form({availablePatterns, wordList} : Props){
     const route = useRoute();
     const page = useTypedPage();
     const patterns : string[] = [];
-
+    const [fontSize, setFontSize] = useState('24px');
     const form = useForm("Create/List",{
       patterns: patterns,
       name: '',
-      totalWords: 10
+      totalWords: 10,
     });
     
     function createList(): void{
       form.post(route("patterns.show"), {
-          preserveState : true,
+          preserveState : false,
         });
     }
     function storeList() : void{   
@@ -66,9 +66,48 @@ export default function form({availablePatterns, wordList} : Props){
               Save List
             </PrimaryButton>}
 
-            {wordList && <PDFDownloadLink  className={classNames('mx-3', { 'opacity-40 pointer-events-none': form.processing})}document={<WordListPDF wordList={wordList} />} fileName="wordlist">
-            {({loading}) => (<div className={classNames('inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'pointer-events-none': form.processing || loading})}>Download PDF</div> )}
-            </PDFDownloadLink>}              
+            {wordList &&
+              <>
+                <PDFDownloadLink  className={classNames('mx-3', { 'opacity-40 pointer-events-none': form.processing})}document={<WordListPDF wordList={wordList} fontSize={fontSize}/>} fileName="wordlist">
+                {({loading}) => (<div className={classNames('inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'pointer-events-none': form.processing || loading})}>Download PDF</div> )}
+                </PDFDownloadLink>
+                <div className="flex">
+                  <div className="relative">
+                    <Dropdown    
+                      align="right"
+                      width="100" 
+                      renderTrigger={() =>  
+                        <span className="inline-flex rounded-md">
+                          <button
+                            type="button"
+                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700 active:bg-gray-50 dark:active:bg-gray-700 transition ease-in-out duration-150"
+                          >
+                            Font Size : {fontSize}
+
+                              <svg
+                                className="ml-2 -mr-0.5 h-4 w-4"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                          </button>
+                          </span>
+                        }>
+                        <button onClick={() => setFontSize('12px')} type="button" className="block px-4 py-2 text-xs text-gray-400">sm</button>
+                        <div className="border-t border-gray-200 dark:border-gray-600" />
+                        <button  onClick={() => setFontSize('24px')} type="button" className="block px-4 py-2 text-xs text-gray-400">md</button>
+                        <div className="border-t border-gray-200 dark:border-gray-600" />
+                        <button onClick={() =>setFontSize('48px')} type="button" className="block px-4 py-2 text-xs text-gray-400">lg</button>
+                      </Dropdown>
+                    </div>
+                </div>
+              </>}              
             <div onClick={() => createList()} className={classNames('cursor-pointer inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'opacity-25 pointer-events-none': form.processing || form.data.patterns.length == 0 })}>
               {wordList ? "Create New List":"Create List"}
             </div>
@@ -113,7 +152,7 @@ export default function form({availablePatterns, wordList} : Props){
                           type="button"
                           className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700 active:bg-gray-50 dark:active:bg-gray-700 transition ease-in-out duration-150"
                         >
-                          List Size
+                          List Size : {form.data.totalWords}
 
                             <svg
                               className="ml-2 -mr-0.5 h-4 w-4"
