@@ -20,7 +20,6 @@ export default function WordBox({w} : Props){
         axios.get(route('word.refresh', word.id)).then(response => {
             const wordData = response.data;
             setWord(wordData.word);
-            console.log(response.data)
         }).catch(error => {
             console.error('Error fetching new word:', error);
         });

@@ -1,9 +1,9 @@
 import React from 'react';
-import WordListTable from './WordListGrid';
-import { WordLIst, WordPattern } from '@/types';
+import WordListTable from './WordListTable';
+import { WordList } from '@/types';
 
 interface Props {
-  list: WordLIst
+  list: WordList
 }
 export default function SavedWordList({list} : Props) {
   return (

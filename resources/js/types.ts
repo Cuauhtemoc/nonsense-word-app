@@ -1,3 +1,5 @@
+import { FileData } from "@aperturerobotics/chonky";
+
 type DateTime = string;
 
 export type Nullable<T> = T | null;
@@ -85,6 +87,28 @@ export interface Role {
   permissions: string[];
   description: string;
 }
+export interface FileMapItem {
+  id: string | number;
+  isDir: boolean | undefined;
+  name: string;
+  parentId?: string;
+  childrenIds?: Array<string | number>;
+  childrenCount?: number;
+  ext?: string;
+}
+
+export interface FileMap {
+  [key: string]: FileMapItem;
+}
+
+export interface FileStructure {
+  rootFolderId: string;
+  fileMap: FileMap;
+}
+export interface CustomFileData extends FileData {
+  parentId?: string;
+  childrenIds?: string[];
+}
 
 export interface TeamInvitation {
   id: number;
@@ -107,7 +131,7 @@ export interface WordPattern {
   id: number;
   words: Word[]
 }
- export interface WordLIst {
+ export interface WordList {
     name: string;
     words : Word[]
  }

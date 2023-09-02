@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import { Word, WordLIst, WordPattern } from '@/types';
+import { Word, WordList } from '@/types';
 
 // Create styles
 let styles = StyleSheet.create({
@@ -39,12 +39,9 @@ let styles = StyleSheet.create({
     
   }
 });
+
 interface Props {
-    wordList: WordLIst;
-    fontSize: string;
-}
-interface Props {
-  wordList: WordLIst;
+  wordList: WordList;
   fontSize: string;
 }
 

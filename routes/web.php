@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PatternsController;
 use App\Http\Controllers\WordListController;
+use App\Http\Controllers\FolderController;
 use App\Http\Controllers\WordsController;
 use Inertia\Inertia;
 
@@ -32,12 +33,20 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', [WordListController::class, 'show'])
+    Route::any('/dashboard', [WordListController::class, 'show'])
     ->name('dashboard');
     Route::any('/patterns/show', [PatternsController::class, 'show'])
     ->name('patterns.show');
     Route::post('/word-list/store', [WordListController::class, 'store'])
     ->name('word-list.store');
+    Route::post('/word-list/destroy/{wordList}', [WordListController::class, 'destroy'])
+    ->name('word-list.destroy');
+    Route::post('/word-list/move', [WordListController::class, 'move'])
+    ->name('word-list.move');
+    Route::post('/folder/store', [FolderController::class, 'store'])
+    ->name('folder.store');
+    Route::post('/folder/destroy/{folder}', [FolderController::class, 'destroy'])
+    ->name('folder.destroy');
     // Route::get('/word-list/show', [WordListController::class, 'show'])
     // ->name('word-list.show');
     Route::get('refresh/{word}', [WordsController::class, 'refresh'])->name('word.refresh');

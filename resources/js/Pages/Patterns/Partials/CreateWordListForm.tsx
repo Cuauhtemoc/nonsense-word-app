@@ -6,45 +6,53 @@ import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
+import WordListTable from "@/Components/WordListTable";
 import WordListPDF from "@/Components/WordListPDF";
-import WordListTable from "@/Components/WordListGrid";
+
 import useRoute from "@/Hooks/useRoute";
 import useTypedPage from "@/Hooks/useTypedPage";
-import { GeneralPattern, WordLIst, WordPattern } from "@/types";
+import { GeneralPattern, WordList } from "@/types";
 import { router, useForm } from "@inertiajs/react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Props {
     availablePatterns: GeneralPattern[]
-    wordList: WordLIst
+    wordList: WordList,
+    makeList : Function 
 }
 
 
-export default function form({availablePatterns, wordList} : Props){
+export default function CreatelistForm({availablePatterns, wordList, makeList} : Props){
   
     const route = useRoute();
     const page = useTypedPage();
     const patterns : string[] = [];
     const [fontSize, setFontSize] = useState('24px');
+    const [name, setName] = useState(wordList ? wordList.name : "");
+    const [list, setWordList] = useState(wordList);
+    useEffect(() => {
+      setWordList(wordList)
+      setName(wordList ? wordList.name : "")
+    }, [wordList])
     const form = useForm("Create/List",{
       patterns: patterns,
-      name: '',
+      name : '',
       totalWords: 10,
     });
     
     function createList(): void{
-      form.post(route("patterns.show"), {
+      form.post(route("dashboard"), {
           preserveState : false,
         });
     }
     function storeList() : void{   
       let data = {
-        name: form.data.name,
-        words: JSON.parse(JSON.stringify(wordList.words))
+        name: name,
+        words: JSON.parse(JSON.stringify(list.words)),
       };
-      router.post('/word-list/store', data);
+      makeList(data.name, data.words);
     }
    return(
     <>
@@ -58,17 +66,17 @@ export default function form({availablePatterns, wordList} : Props){
               Done
             </ActionMessage>
    
-            {wordList && <PrimaryButton
-              className={classNames({ 'opacity-25 pointer-events-none': form.processing || !form.data.name}
+            {list && <PrimaryButton
+              className={classNames({ 'opacity-25 pointer-events-none': form.processing || !name}
               )}
-              disabled={!form.data.name}
+              disabled={!name}
             >
               Save List
             </PrimaryButton>}
 
-            {wordList &&
+            {list &&
               <>
-                <PDFDownloadLink  className={classNames('mx-3', { 'opacity-40 pointer-events-none': form.processing})}document={<WordListPDF wordList={wordList} fontSize={fontSize}/>} fileName="wordlist">
+                <PDFDownloadLink  className={classNames('mx-3', { 'opacity-40 pointer-events-none': form.processing})}document={<WordListPDF wordList={list} fontSize={fontSize}/>} fileName="list">
                 {({loading}) => (<div className={classNames('inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'pointer-events-none': form.processing || loading})}>Download PDF</div> )}
                 </PDFDownloadLink>
                 <div className="flex">
@@ -109,7 +117,7 @@ export default function form({availablePatterns, wordList} : Props){
                 </div>
               </>}              
             <div onClick={() => createList()} className={classNames('cursor-pointer inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150', { 'opacity-25 pointer-events-none': form.processing || form.data.patterns.length == 0 })}>
-              {wordList ? "Create New List":"Create List"}
+              {list ? "Create New List":"Create List"}
             </div>
           </>
         )}
@@ -182,16 +190,16 @@ export default function form({availablePatterns, wordList} : Props){
             </div>
         </div>
       </FormSection>
-      {wordList && 
+      {list && 
         <div className="col-span-6 sm:col-span-4">
           <InputLabel htmlFor="name">Word List Name</InputLabel>
             <TextInput
               id="name"
               type="text"
               className="mt-1 block w-full"
-              value={form.data.name}
+              value={name}
               onChange={e =>
-                form.setData('name', e.currentTarget.value)
+                setName( e.currentTarget.value)
               }
               autoFocus
             />
@@ -200,8 +208,8 @@ export default function form({availablePatterns, wordList} : Props){
               className="mt-2"
             />
           </div>}
-      {wordList && <WordListTable wordList={wordList}/>}
-      
+      {list && <WordListTable wordList={list}/>}
+    
     </>
 
    )

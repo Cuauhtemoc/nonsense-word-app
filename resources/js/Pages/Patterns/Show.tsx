@@ -1,13 +1,14 @@
 import AppLayout from '@/Layouts/AppLayout';
 import React from 'react';
 import CreateWordListForm from './Partials/CreateWordListForm';
-import { GeneralPattern, WordLIst } from '@/types';
+import { GeneralPattern, WordList } from '@/types';
 
 interface Props {
     availablePatterns: GeneralPattern[];
-    wordList: WordLIst
+    wordList: WordList,
+    folderId: string
 }
-export default function Show({availablePatterns, wordList}:Props){
+export default function Show({availablePatterns, wordList, folderId}:Props){
 
     return(
         <AppLayout
@@ -19,7 +20,7 @@ export default function Show({availablePatterns, wordList}:Props){
         )}
         >
         <div className="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-            <CreateWordListForm availablePatterns={availablePatterns}  wordList={wordList}/>
+            <CreateWordListForm availablePatterns={availablePatterns}  wordList={wordList} makeList={() => {}}/>
         </div>
         
         </AppLayout>

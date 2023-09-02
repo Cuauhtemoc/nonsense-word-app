@@ -69,5 +69,12 @@ class User extends Authenticatable
      public function wordLists() : HasMany {
         return $this->hasMany(WordList::class)->with('words');
      }
+       /**
+     *  The folders this user has saved 
+     * * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function folders() : HasMany {
+        return $this->hasMany(Folder::class);
+     }
     
 }
