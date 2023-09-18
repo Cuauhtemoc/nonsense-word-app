@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('word_lists', function (Blueprint $table) {
-            $table->foreignId('folder_id')->nullable();
+            $table->uuid('folder_id')->nullable();
+            $table->foreign('folder_id')->references('id')->on('folders');
           
 
         });

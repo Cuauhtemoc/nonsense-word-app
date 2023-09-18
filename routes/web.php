@@ -7,6 +7,7 @@ use App\Http\Controllers\WordListController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\WordsController;
 use Inertia\Inertia;
+use Sassnowski\LaravelShareableModel\Shareable\ShareableLink;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,13 +28,15 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+Route::get('shared/word-list/{shareable_link}', [WordListController::class, 'showShared'])->middleware('shared');
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
+   
 ])->group(function () {
-    Route::any('/dashboard', [WordListController::class, 'show'])
+    Route::any('/dashboard', [WordListController::class, 'index'])
     ->name('dashboard');
     Route::any('/patterns/show', [PatternsController::class, 'show'])
     ->name('patterns.show');
@@ -43,6 +46,8 @@ Route::middleware([
     ->name('word-list.destroy');
     Route::post('/word-list/move', [WordListController::class, 'move'])
     ->name('word-list.move');
+    Route::post('/word-list/generate', [WordListController::class, 'generateList'])
+    ->name('word-list.generate');
     Route::post('/folder/store', [FolderController::class, 'store'])
     ->name('folder.store');
     Route::post('/folder/destroy/{folder}', [FolderController::class, 'destroy'])
@@ -50,4 +55,5 @@ Route::middleware([
     // Route::get('/word-list/show', [WordListController::class, 'show'])
     // ->name('word-list.show');
     Route::get('refresh/{word}', [WordsController::class, 'refresh'])->name('word.refresh');
+
 });

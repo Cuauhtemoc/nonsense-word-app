@@ -12,6 +12,7 @@ use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\WordList;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 
 class User extends Authenticatable
@@ -60,21 +61,22 @@ class User extends Authenticatable
      */
     protected $appends = [
         'profile_photo_url',
-   
+
     ];
     /**
      *  The word lists this user has saved 
      * * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-     public function wordLists() : HasMany {
+    public function wordLists(): HasMany
+    {
         return $this->hasMany(WordList::class)->with('words');
-     }
-       /**
+    }
+    /**
      *  The folders this user has saved 
      * * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function folders() : HasMany {
+    public function folders(): HasMany
+    {
         return $this->hasMany(Folder::class);
-     }
-    
+    }
 }

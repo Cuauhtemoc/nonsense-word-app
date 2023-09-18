@@ -1,37 +1,25 @@
-/**
- * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @copyright 2020
- * @license MIT
- */
-
 import {
-  ChonkyActions,
-  FileArray,
-  FileBrowserProps,
-  FileData,
-  FileHelper,
-  FullFileBrowser,
+    ChonkyActions,
+    FileArray,
+    FileBrowserProps,
+    FileData,
+    FileHelper,
+    FullFileBrowser,
 } from '@aperturerobotics/chonky';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-
-
-import { CreatePDF, EditList } from '@/types/custom-actions';
+import { CopyShareableLink } from '@/types/custom-actions';
 import { CustomFileData, GeneralPattern, WordList } from '@/types';
 import useRoute from '@/Hooks/useRoute';
 import axios from 'axios';
-
 import CreateWordListForm from '@/Pages/Patterns/Partials/CreateWordListForm';
-import WordListPDF from './WordListPDF';
-import { BlobProvider, PDFDownloadLink, PDFViewer, pdf } from '@react-pdf/renderer';
-import classNames from 'classnames';
+
 
 
 // We define a custom interface for file data because we want to add some custom fields
 // to Chonky's built-in `FileData` interface.
 
 interface CustomFileMap {
-  [fileId: string]: CustomFileData;
+    [fileId: string]: CustomFileData;
 }
 
 // Helper method to attach our custom TypeScript types to the imported JSON file map.
@@ -48,7 +36,7 @@ const actionsToDisable: string[] = [
 
 // Hook that sets up our file map and defines functions used to mutate - `deleteFiles`,
 // `moveFiles`, and so on.
-const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
+const useCustomFileMap = (fs: CustomFileData, wordList: WordList) => {
 
     //set up the hook to use our laravel routes
     const route = useRoute();
@@ -74,7 +62,7 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
         // lets us access the current file map value without having to track it
         // explicitly. Read more about it here:
         // https://reactjs.org/docs/hooks-reference.html#functional-updates
-        setFileMap((currentFileMap : CustomFileData) => {
+        setFileMap((currentFileMap: CustomFileData) => {
             // Create a copy of the file map to make sure we don't mutate it.
             const newFileMap = { ...currentFileMap };
 
@@ -84,15 +72,15 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
                     delete newFileMap[file.id];
                 })
                 // Delete file from the file map.
-               
-                    
+
+
                 // Update the parent folder to make sure it doesn't try to load the
                 // file we just deleted.
                 if (file.parentId) {
-                    
+
                     const parent = newFileMap[file.parentId]!;
                     const newChildrenIds = parent.childrenIds!.filter(
-                        (id : string) => id !== file.id
+                        (id: string) => id !== file.id
                     );
                     newFileMap[file.parentId] = {
                         ...parent,
@@ -114,10 +102,10 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
             source: CustomFileData,
             destination: CustomFileData
         ) => {
-        
+
             const moveFileIds = new Set(files.map((f) => f.id));
-            setFileMap((currentFileMap : any) => {
-                axios.post('word-list/move', {destination_id:destination.id, moveFileIds: [...moveFileIds],source_id:source.id });
+            setFileMap((currentFileMap: any) => {
+                axios.post('word-list/move', { destination_id: destination.id, moveFileIds: [...moveFileIds], source_id: source.id });
                 // axios.post(route('word-list.move'), {destination_id:destination.id, moveFileIds: [...moveFileIds],source_id:source.id });
                 const newFileMap = { ...currentFileMap };
                 // Delete files from their source folder.
@@ -151,9 +139,9 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
                 })
                 return newFileMap;
             })
-            
-            
-          
+
+
+
         },
         []
     );
@@ -163,11 +151,11 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
     // not a good practice in production! Instead, you should use something like UUIDs
     // or MD5 hashes for file paths.
     const createFolder = useCallback((folderName: string) => {
-        axios.post(route('folder.store'), {name: folderName, parent_id:currentFolderIdRef.current}).then(res =>{
+        axios.post(route('folder.store'), { name: folderName, parent_id: currentFolderIdRef.current }).then(res => {
 
-            setFileMap((currentFileMap : any) => {
+            setFileMap((currentFileMap: any) => {
                 const newFileMap = { ...currentFileMap };
-    
+
                 // Create the new folder
                 const newFolderId = res.data.folder_id;
                 newFileMap[newFolderId] = {
@@ -179,18 +167,18 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
                     childrenIds: [],
                     childrenCount: 0,
                 };
-    
+
                 // Update parent folder to reference the new folder.
                 const parent = newFileMap[currentFolderIdRef.current];
                 newFileMap[currentFolderIdRef.current] = {
                     ...parent,
                     childrenIds: [...parent.childrenIds!, newFolderId],
                 };
-    
+
                 return newFileMap;
             });
         })
-      
+
     }, []);
 
     // Function that will be called when user creates a new folder using the toolbar
@@ -198,33 +186,33 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
     // not a good practice in production! Instead, you should use something like UUIDs
     // or MD5 hashes for file paths.
     const createList = useCallback((name: string, words: string[]) => {
-        axios.post(route('word-list.store'), {name: name, folder_id:currentFolderIdRef.current, words:words}).then(res =>{
+        axios.post(route('word-list.store'), { name: name, folder_id: currentFolderIdRef.current, words: words }).then(res => {
 
-            setFileMap((currentFileMap : any) => {
+            setFileMap((currentFileMap: any) => {
                 const newFileMap = { ...currentFileMap };
-    
                 // Create the new folder
                 const newListId = res.data.id;
                 newFileMap[newListId] = {
-                    id: newListId,
-                    name: name,
-                    ext:  "",
-                    modDate: new Date(),
-                    parentId: currentFolderIdRef.current,
+                    ...res.data
                 };
-    
+
                 // Update parent folder to reference the new folder.
                 const parent = newFileMap[currentFolderIdRef.current];
                 newFileMap[currentFolderIdRef.current] = {
                     ...parent,
                     childrenIds: [...parent.childrenIds!, newListId],
                 };
-    
+
                 return newFileMap;
             });
         })
-      
+
     }, []);
+    const copyShareableLink = useCallback((wordList: WordList) => {
+        navigator.clipboard.writeText(wordList.shareableLink)
+
+    }, []);
+
     return {
         fileMap,
         currentFolderId,
@@ -236,25 +224,26 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
         moveFiles,
         createFolder,
         createList,
+        copyShareableLink
     };
-    };
+};
 
-    export const useFiles = (
+export const useFiles = (
     fileMap: CustomFileMap,
     currentFolderId: string
-    ): FileArray => {
+): FileArray => {
     return useMemo(() => {
         const currentFolder = fileMap[currentFolderId];
         const childrenIds = currentFolder.childrenIds!;
         const files = childrenIds.map((fileId: string) => fileMap[fileId]);
         return files;
     }, [currentFolderId, fileMap]);
-    };
+};
 
-    export const useFolderChain = (
+export const useFolderChain = (
     fileMap: CustomFileMap,
     currentFolderId: string
-    ): FileArray => {
+): FileArray => {
     return useMemo(() => {
         const currentFolder = fileMap[currentFolderId];
 
@@ -273,69 +262,76 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
 
         return folderChain;
     }, [currentFolderId, fileMap]);
-    };
+};
 
-    export const useFileActionHandler = (
+export const useFileActionHandler = (
     setCurrentFolderId: (folderId: string) => void,
-    setCurrentWordList : (wordList : WordList) => void,
+    setCurrentWordList: (wordList: WordList) => void,
     deleteFiles: (files: CustomFileData[]) => void,
     moveFiles: (files: FileData[], source: FileData, destination: FileData) => void,
     createFolder: (folderName: string) => void,
-     
-    ) => {
-        
-        return useCallback(
-           
-            (data: any) => {
-                if(data.id == ChonkyActions.ChangeSelection.id){
-                    const file = data.state.selectedFilesForAction[0]
-                    if(file && !FileHelper.isDirectory(file)){  
-                        setCurrentWordList(file);
-                        return;
-                    }
+    copyShareableLink: (wordList: WordList) => void,
+
+) => {
+
+    return useCallback(
+
+        (data: any) => {
+            const file = data.state.selectedFilesForAction[0]
+            if (data.id == ChonkyActions.ChangeSelection.id) {
+
+                if (file && !FileHelper.isDirectory(file)) {
+                    setCurrentWordList(file);
                     return;
                 }
-                else if (data.id === ChonkyActions.OpenFiles.id) {
-                    const { targetFile, files } = data.payload;
-                    const fileToOpen = targetFile ?? files[0];
-                    if (fileToOpen && FileHelper.isDirectory(fileToOpen)) {
-                        setCurrentFolderId(fileToOpen.id);
-                        return;
-                    }
-                } else if (data.id === ChonkyActions.DeleteFiles.id) {
-                    deleteFiles(data.state.selectedFilesForAction!);
-                } else if (data.id === ChonkyActions.MoveFiles.id) {
-                    moveFiles(
-                        data.payload.files,
-                        data.payload.source!,
-                        data.payload.destination
-                    );
-                } else if (data.id === ChonkyActions.CreateFolder.id) {
-                    const folderName = prompt('Provide the name for your new folder:');
-                    if (folderName) createFolder(folderName);
+                return;
+            }
+            else if (data.id === ChonkyActions.OpenFiles.id) {
+                const { targetFile, files } = data.payload;
+                const fileToOpen = targetFile ?? files[0];
+                if (fileToOpen && FileHelper.isDirectory(fileToOpen)) {
+                    setCurrentFolderId(fileToOpen.id);
+                    return;
                 }
-                // else if(data.id == EditList.id) {
-                //     const file = data.state.selectedFilesForAction[0]
-                //     if (file && !FileHelper.isDirectory(file)) {
-                //         setCurrentWordList(file);
-                //         return;
-                //     }
-                    
-                //     return;
-                // }
-            },
-            [createFolder, deleteFiles, moveFiles, setCurrentFolderId, setCurrentWordList]
+            } else if (data.id === ChonkyActions.DeleteFiles.id) {
+                deleteFiles(data.state.selectedFilesForAction!);
+            } else if (data.id === ChonkyActions.MoveFiles.id) {
+                moveFiles(
+                    data.payload.files,
+                    data.payload.source!,
+                    data.payload.destination
+                );
+            } else if (data.id === ChonkyActions.CreateFolder.id) {
+                const folderName = prompt('Provide the name for your new folder:');
+                if (folderName) createFolder(folderName);
+            }
+            else if (data.id == CopyShareableLink.id) {
+
+                copyShareableLink(file);
+                return;
+            }
+            // else if(data.id == EditList.id) {
+            //     const file = data.state.selectedFilesForAction[0]
+            //     if (file && !FileHelper.isDirectory(file)) {
+            //         setCurrentWordList(file);
+            //         return;
+            //     }
+
+            //     return;
+            // }
+        },
+        [createFolder, deleteFiles, moveFiles, setCurrentFolderId, setCurrentWordList, copyShareableLink]
     );
-    };
+};
 
-    interface VFSProps extends Partial<FileBrowserProps>{
-        fs: CustomFileData,
-        availablePatterns: GeneralPattern[]
-        wordList: WordList
+interface VFSProps extends Partial<FileBrowserProps> {
+    fs: CustomFileData,
+    availablePatterns: GeneralPattern[]
+    wordList: WordList
 
-    }
+}
 
-    export const VFSBrowser: React.FC<VFSProps> = React.memo((props) => {
+export const VFSBrowser: React.FC<VFSProps> = React.memo((props) => {
     const {
         fileMap,
         currentFolderId,
@@ -346,6 +342,7 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
         moveFiles,
         createFolder,
         createList,
+        copyShareableLink
     } = useCustomFileMap(props.fs, props.wordList);
     const files = useFiles(fileMap, currentFolderId);
     const folderChain = useFolderChain(fileMap, currentFolderId);
@@ -355,12 +352,13 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
         deleteFiles,
         moveFiles,
         createFolder,
+        copyShareableLink
     );
     const fileActions = useMemo(
-        () => [ChonkyActions.CreateFolder, ChonkyActions.DeleteFiles],
+        () => [ChonkyActions.CreateFolder, ChonkyActions.DeleteFiles, CopyShareableLink],
         []
     );
-    
+
     return (
         <>
             <div style={{ height: 400 }}>
@@ -371,7 +369,7 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
                     onFileAction={handleFileAction}
                     disableDefaultFileActions={actionsToDisable}
                     defaultFileViewActionId={"grid"}
-                
+
                     {...props}
                 />
             </div>
@@ -379,7 +377,7 @@ const useCustomFileMap = (fs : CustomFileData, wordList : WordList )  => {
                 <CreateWordListForm availablePatterns={props.availablePatterns} wordList={currentWordList} makeList={createList} />
             </div>
         </>
-        
+
 
     );
 });

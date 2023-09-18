@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
 
 class Folder extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     protected $fillable = ['name', 'parent_id'];
-    
+
     public function wordLists()
     {
         return $this->hasMany(WordList::class);
@@ -19,5 +21,4 @@ class Folder extends Model
     {
         return $this->hasMany(Folder::class, 'parent_id', 'id');
     }
-    
 }

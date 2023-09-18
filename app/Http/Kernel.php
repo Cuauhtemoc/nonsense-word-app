@@ -45,6 +45,9 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
+        'route' => [
+            \Sassnowski\LaravelShareableModel\Http\Middleware\ValidateShareableLink::class,
+        ]
     ];
 
     /**
@@ -65,5 +68,6 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'shared' => \Sassnowski\LaravelShareableModel\Http\Middleware\ValidateShareableLink::class,
     ];
 }

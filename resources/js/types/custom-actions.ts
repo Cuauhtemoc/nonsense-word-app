@@ -32,3 +32,14 @@ export const CreatePDF  = defineFileAction({
         icon: ChonkyIconName.file
     },
 } as const);
+export const CopyShareableLink  = defineFileAction({
+    id: 'copy_shareable_link',
+    requiresSelection: true,
+    button: {
+        name: 'Copy shareable link',
+        toolbar: true,
+        contextMenu: true,
+        group: "Actions", 
+        icon: ChonkyIconName.copy
+    },
+} as const);

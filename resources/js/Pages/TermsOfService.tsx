@@ -6,7 +6,7 @@ interface Props {
   terms: string;
 }
 
-export default function TermsOfService({ terms }: Props) {
+export default function TermsOfService({ terms }: Props) : JSX.Element {
   return (
     <div className="font-sans text-gray-900 dark:text-gray-100 antialiased">
       <Head title="Terms of Service" />

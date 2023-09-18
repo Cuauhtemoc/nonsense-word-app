@@ -33,7 +33,7 @@ class FolderController extends Controller
             $formattedFolder["childrenIds"][] = (string)$wordList->id;
         }
         
-        return $formattedData;
+        return $formattedFolder;
     }
 
     private function formatFileOrFolder($item)

@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('folders', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('name');
-            $table->foreignId('user_id');
-            $table->timestamps();
+        Schema::table('shareable_links', function (Blueprint $table) {
+            $table->uuid('shareable_id')->change();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('folders');
+        Schema::table('shareable_links', function (Blueprint $table) {
+            $table->unsignedInteger('shareable_id')->change();
+        });
     }
 };

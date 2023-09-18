@@ -3,7 +3,7 @@ import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo';
 
 export default function AuthenticationCard({
   children,
-}: PropsWithChildren<Record<string, unknown>>) {
+}: PropsWithChildren<Record<string, unknown>>) : JSX.Element{
   return (
     <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
       <div>

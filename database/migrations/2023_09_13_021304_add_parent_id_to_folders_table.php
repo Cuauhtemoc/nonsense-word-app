@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('folders', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('name');
-            $table->foreignId('user_id');
-            $table->timestamps();
+        Schema::table('folders', function (Blueprint $table) {
+            $table->uuid('parent_id')->nullable();
+            $table->foreign('parent_id')->references('id')->on('folders')->onDelete('cascade');
+
         });
     }
 
@@ -24,6 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('folders');
+        Schema::table('folders', function (Blueprint $table) {
+            //
+        });
     }
 };

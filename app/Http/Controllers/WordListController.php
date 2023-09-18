@@ -8,19 +8,78 @@ use App\Models\Folder;
 use App\Models\GeneralPattern;
 use App\Models\Word;
 use Illuminate\Http\Request;
+use Sassnowski\LaravelShareableModel\Shareable\ShareableLink;
+use Sassnowski\LaravelShareableModel\Shareable\SharedLink;
 use Inertia\Inertia;
-
 
 class WordListController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $rootFolder =  $request->user()->folders()->whereNull('parent_id')->first();
+        $wordLists = $request->user()->wordLists()->get();
+        $folders = $request->user()->folders()->get();
+        $formattedData = [];
+
+        foreach ($wordLists as $list) {
+            $formattedData[$list->id] = $this->formatWordList($list);
+        }
+        foreach ($folders as $folder) {
+            $formattedData[$folder->id] = $this->formatFolder($folder);
+        }
+
+        //fs represents all the data to represent out file system on the front end
+        return Inertia::render('Dashboard', [
+            "fs" => [
+                "rootFolderId" => (string)$rootFolder->id,
+                "fileMap" => $formattedData,
+            ],
+            "availablePatterns" => GeneralPattern::with('patterns')->get()
+        ]);
+    
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function generateList(Request $request)
+    {
+        $data = $request->validate([
+            'patterns' => 'required|array',
+            'listSize' => 'required|integer'
+        ]);
+
+
+        $allWords = [];
+        $patternData = $data['patterns'];
+        $patternCount = count($patternData);
+        $totalWords = $data['listSize'];
+
+        $numberOfWordsPerPattern = floor($totalWords / $patternCount);
+        $remainingWords = $totalWords % $patternCount;
+
+        foreach ($patternData as $pattern) {
+
+            $wordsLimit = $numberOfWordsPerPattern + ($remainingWords > 0 ? 1 : 0);
+            $remainingWords--;
+
+            $words = Word::where('pattern_id', '=', $pattern)->inRandomOrder()->limit($wordsLimit)->get();
+            $allWords = array_merge($allWords, $words->toArray());
+        }
+        shuffle($allWords);
+
+        return response()->json(
+            [
+                'wordList' => [
+                    "name" => "",
+                    "words" => $allWords
+                ]
+            ]
+        );
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -28,13 +87,12 @@ class WordListController extends Controller
     {
         //
     }
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-       
+
         $validatedData = $request->validateWithBag("wordList", [
             'name' => ['required', 'string'],
             'folder_id' => ['required', 'string'],
@@ -46,56 +104,61 @@ class WordListController extends Controller
         $wordList->user_id = $request->user()->id;
         $wordList->folder_id = $request['folder_id'];
         $wordList->save();
-        
+        //attach all the associated workds with this list
         $wordData = $validatedData["words"];
         $filteredArray = array_column($wordData, 'id');
-        $wordList->words()->attach($filteredArray); 
+        $wordList->words()->attach($filteredArray);
+        //create the sharable link for this word list
+        ShareableLink::buildFor($wordList)
+            ->setActive()
+            ->setPrefix('word-list')
+            ->build();
 
-        return response()->json([
-            'id' => (string)$wordList->id
-
-        ], 200);
+        return response()->json(
+            $this->formatWordList($wordList)
+        , 200);
     }
     /**
      * Transform the folder data for Chonky.js 
      */
     private function formatFolder($folder)
     {
-        \Log::debug($folder);
         $formattedFolder = [
             "id" => (string)$folder->id,
             "isDir" => true,
-            "name" => $folder->name, 
+            "name" => $folder->name,
             "childrenIds" => [],
             'parentId' => (string)$folder->parent_id,
             'childrenCount' => 0,
             'modDate' => $folder->updated_at ?? $folder->created_at
         ];
-   
+
         foreach ($folder->wordLists as $wordList) {
             $formattedFolder["childrenIds"][] = (string)$wordList->id;
-
         }
-        
+
         foreach ($folder->folders as $folder) {
             $formattedFolder["childrenIds"][] = (string)$folder->id;
         }
 
-        $formattedFolder["childrenCount"] = count( $formattedFolder["childrenIds"]);
+        $formattedFolder["childrenCount"] = count($formattedFolder["childrenIds"]);
 
         return $formattedFolder;
     }
     /**
      * Transform the list data for Chonky.js
      */
-    private function formatWordList($wordList){
+    private function formatWordList($wordList)
+    {
+
         $formattedList = [
             'id' => (string)$wordList->id,
             'name' => $wordList->name,
             'parentId' => (string)$wordList->folder_id,
             'modDate' => $wordList->updated_at ?? $wordList->created_at,
             'ext' => '',
-            'words' => $wordList->words
+            'words' => $wordList->words,
+            'shareableLink' => $wordList->links->first()->url
         ];
         return $formattedList;
     }
@@ -104,58 +167,14 @@ class WordListController extends Controller
      */
     public function show(Request $request)
     {
-        $rootFolder =  $request->user()->folders()->whereNull('parent_id')->first();
-        $wordLists = $request->user()->wordLists()->get();
-        $folders = $request->user()->folders()->get();
-        $formattedData = [];
 
-        foreach($wordLists as $list){
-            $formattedData[$list->id] = $this->formatWordList($list);
-        }
-        foreach($folders as $folder){
-            $formattedData[$folder->id] = $this->formatFolder($folder);
-        }
-        if($request->has("patterns")){
-            $allWords = [];
-            $patternData = $request->input("patterns");
-            $patternCount = count($patternData);
-            $totalWords = $request->input('totalWords');
+    }
+    public function showShared(ShareableLink $link)
+    {
+        return Inertia::render('SharedWordList/Show', [
+            'wordList' => $link->shareable,
+            'canLogin' => true,
 
-            $numberOfWordsPerPattern = floor($totalWords / $patternCount);
-            $remainingWords = $totalWords % $patternCount;
-
-            foreach ($patternData as $pattern) {
-
-                $wordsLimit = $numberOfWordsPerPattern + ($remainingWords > 0 ? 1 : 0);
-                $remainingWords--;
-
-                $words = Word::where('pattern_id', '=', $pattern)->inRandomOrder()->limit($wordsLimit)->get();  
-                $allWords = array_merge($allWords, $words->toArray());
-            
-            }
-            shuffle($allWords);
-
-            return Inertia::render('Dashboard', 
-            [
-                "fs" => [
-                    "rootFolderId" => (string)$rootFolder->id,
-                    "fileMap" => $formattedData,
-                    "availablePatterns" => GeneralPattern::with('patterns')->get()
-                ],
-                "availablePatterns" => GeneralPattern::with('patterns')->get(),
-                'wordList' => [
-                    "name" => "",
-                    "words" => $allWords
-                ]
-            ]);
-        }
-        //fs represents all the data to represent out file system on the front end
-        return Inertia::render('Dashboard', [
-            "fs" => [
-                "rootFolderId" => (string)$rootFolder->id,
-                "fileMap" => $formattedData,
-            ],
-            "availablePatterns" => GeneralPattern::with('patterns')->get()
         ]);
     }
     /**
@@ -163,7 +182,7 @@ class WordListController extends Controller
      */
     public function move(Request $request)
     {
-         $validatedData = $request->validateWithBag("moveLists", [
+        $validatedData = $request->validateWithBag("moveLists", [
             'destination_id' => ['required', 'string'],
             'moveFileIds' => ['required', 'array'],
         ]);
@@ -173,7 +192,6 @@ class WordListController extends Controller
             'message' => 'success'
 
         ], 200);
-
     }
     /**
      * Show the form for editing the specified resource.

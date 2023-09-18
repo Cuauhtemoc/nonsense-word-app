@@ -48,9 +48,7 @@ export default function AppLayout({
   return (
     <div>
       <Head title={title} />
-
       <Banner />
-
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
         <nav className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
           {/* <!-- Primary Navigation Menu --> */}
@@ -60,10 +58,9 @@ export default function AppLayout({
                 {/* <!-- Logo --> */}
                 <div className="flex-shrink-0 flex items-center">
                   <Link href={route('dashboard')}>
-                    <ApplicationMark className="block h-9 w-auto" />
+                    <ApplicationMark className="block h-8 w-auto" />
                   </Link>
                 </div>
-
                 {/* <!-- Navigation Links --> */}
                 <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                   <NavLink

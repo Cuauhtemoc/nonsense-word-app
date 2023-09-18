@@ -1,4 +1,4 @@
-import { FileData } from "@aperturerobotics/chonky";
+import type { FileData } from "@aperturerobotics/chonky";
 
 type DateTime = string;
 
@@ -133,5 +133,6 @@ export interface WordPattern {
 }
  export interface WordList {
     name: string;
+    shareableLink: string,
     words : Word[]
  }

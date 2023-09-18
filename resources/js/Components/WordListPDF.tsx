@@ -7,7 +7,7 @@ let styles = StyleSheet.create({
   page: {
     flexDirection: 'row',
     backgroundColor: '#E4E4E4',
-    
+
   },
   section: {
     width: '100%',
@@ -15,17 +15,17 @@ let styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
     marginVertical: 12
-    
-  
+
+
   },
   heading: {
 
     display: 'flex',
     flexDirection: 'row',
-    
+
   },
-  word : {
-  
+  word: {
+
     paddingTop: "60px",
     paddingBottom: "60px",
     margin: "10px",
@@ -36,7 +36,7 @@ let styles = StyleSheet.create({
     alignContent: 'center',
     textAlign: 'center',
     flexWrap: 'wrap'
-    
+
   }
 });
 
@@ -73,21 +73,29 @@ const WordListPDF = ({ wordList, fontSize }: Props) => {
     while (wordQueue.length) {
       const wordComponents = [];
 
-      for (let i = 0; i < numPerRow && wordQueue.length > 0; i++) {
+      for (let i = 0; i < numPerRow; i++) {
         const word = wordQueue.pop();
-        wordComponents.push(
-          <Text wrap={false} key={word?.word} style={dynamicStyles}>
-            {word?.word}
-          </Text>
-        );
+        if (word) {
+          wordComponents.push(
+            <Text wrap={false} key={word.word} style={dynamicStyles}>
+              {word.word}
+            </Text>
+          );
+        } else {
+          // If there are no more words, add an empty placeholder
+          wordComponents.push(
+            <Text key={'placeholder-' + i} style={dynamicStyles}></Text>
+          );
+        }
       }
-
-      const row = <View style={styles.heading}>{wordComponents}</View>;
+      const row = <View key={'row-' + rows.length} style={styles.heading}>{wordComponents}</View>;
       rows.push(row);
     }
 
     return rows;
   };
+
+  if (!wordList) return null;
 
   return (
     <Document>

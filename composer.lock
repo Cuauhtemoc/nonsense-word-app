@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "de6d06a6d1e9338117c5a907bd6f7a9f",
+    "content-hash": "c7596ea65dc7be78714be6af70018b9e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3612,6 +3612,72 @@
                 }
             ],
             "time": "2023-04-15T23:01:58+00:00"
+        },
+        {
+            "name": "sassnowski/laravel-shareable-models",
+            "version": "v4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ksassnowski/laravel-shareable-models.git",
+                "reference": "5d5a0bc572de4f50a45a2ee37429425685db50de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ksassnowski/laravel-shareable-models/zipball/5d5a0bc572de4f50a45a2ee37429425685db50de",
+                "reference": "5d5a0bc572de4f50a45a2ee37429425685db50de",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^10.0",
+                "illuminate/http": "^10.0",
+                "illuminate/support": "^10.0",
+                "php": "~8.1.0 || ~8.2.0",
+                "ramsey/uuid": "^4.7"
+            },
+            "require-dev": {
+                "doctrine/dbal": "^3.5",
+                "ergebnis/composer-normalize": "^2.29",
+                "mockery/mockery": "^1.4.4",
+                "nunomaduro/larastan": "^2.5.1",
+                "orchestra/testbench": "^8.0",
+                "phpunit/phpunit": "^10.0",
+                "roave/security-advisories": "dev-latest"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Sassnowski\\LaravelShareableModel\\ShareableLinkServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sassnowski\\LaravelShareableModel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kai Sassnowski",
+                    "email": "me@kai-sassnowki.com"
+                }
+            ],
+            "description": "Create shareable links from your eloquent models.",
+            "support": {
+                "issues": "https://github.com/ksassnowski/laravel-shareable-models/issues",
+                "source": "https://github.com/ksassnowski/laravel-shareable-models/tree/v4.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/ksassnowski",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-03-17T10:00:25+00:00"
         },
         {
             "name": "symfony/console",
