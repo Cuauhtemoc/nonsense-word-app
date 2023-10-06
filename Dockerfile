@@ -21,9 +21,7 @@ RUN chown -R www-data: /app
 
 WORKDIR /app
 
-RUN npm install -g npm
-
-RUN npm install -g create-vite
+RUN npm install
 
 RUN npm run build
 
