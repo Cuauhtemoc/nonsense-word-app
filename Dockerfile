@@ -6,8 +6,8 @@ RUN mkdir -p /run/nginx
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
-RUN mkdir -p /app
-COPY . /app
+RUN mkdir -p /src
+COPY . /src
 
 RUN sh -c "wget http://getcomposer.org/composer.phar && chmod a+x composer.phar && mv composer.phar /usr/local/bin/composer"
 RUN cd /app && \
@@ -19,7 +19,7 @@ RUN apk add --update nodejs npm
 
 RUN chown -R www-data: /app
 
-WORKDIR /app
+WORKDIR /src
 
 RUN npm install -g npm
 
