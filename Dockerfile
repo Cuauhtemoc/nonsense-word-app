@@ -21,4 +21,6 @@ RUN chown -R www-data: /app
 
 RUN npm install -g npm
 
+RUN npm run build
+
 CMD sh /app/docker/startup.sh
