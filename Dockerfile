@@ -15,6 +15,10 @@ RUN cd /app && \
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y nodejs \
+    npm 
+    
 RUN chown -R www-data: /app
 
 RUN npm install
