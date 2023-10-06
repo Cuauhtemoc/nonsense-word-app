@@ -18,9 +18,9 @@ import { Grid } from 'react-loader-spinner'
 import LoadingGrid from "@/Components/LoadingGrid";
 
 interface Props {
-  availablePatterns: GeneralPattern[]
-  wordList: WordList,
-  makeList: Function
+  availablePatterns: GeneralPattern[];
+  wordList: WordList;
+  makeList: (name: string, words: WordList) => void
 }
 
 
@@ -31,11 +31,11 @@ export default function CreatelistForm({ availablePatterns, wordList, makeList }
 
   const [fontSize, setFontSize] = useState('24px');
   const [listSize, setListSize] = useState(10);
-
   const [selectedPatterns, setSelectedPatterns] = useState<string[]>([]);
   const [name, setName] = useState(wordList ? wordList.name : "");
   const [list, setWordList] = useState(wordList);
   const [processing, setProcessing] = useState(false);
+
   useEffect(() => {
     setWordList(wordList)
     setName(wordList ? wordList.name : "")
@@ -52,11 +52,13 @@ export default function CreatelistForm({ availablePatterns, wordList, makeList }
     });
   }
   function storeList(): void {
+    setProcessing(true);
     let data = {
       name: name,
       words: JSON.parse(JSON.stringify(list.words)),
     };
     makeList(data.name, data.words);
+    setProcessing(false);
   }
   return (
     <>
@@ -92,7 +94,7 @@ export default function CreatelistForm({ availablePatterns, wordList, makeList }
           <ListSizeOptions setData={setListSize} listSize={listSize} />
           <FontSizeOptions fontSize={fontSize} setFontSize={setFontSize} />
           <SaveListButton onSubmit={storeList} processing={processing} name={name} />
-          <CreatePDFButton wordList={list} fontSize="24px" processing={processing} name={name}/>
+          <CreatePDFButton wordList={list} fontSize="24px" processing={processing} name={name} />
         </div>
         <PatternSelector availablePatterns={availablePatterns} selectedPatterns={selectedPatterns} setSelectedPatterns={setSelectedPatterns} />
       </div>

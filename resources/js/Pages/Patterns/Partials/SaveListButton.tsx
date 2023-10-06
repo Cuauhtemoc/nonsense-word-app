@@ -3,9 +3,9 @@ import classNames from "classnames";
 import React from "react";
 
 interface Props {
-    name: string,
-    processing: boolean,
-    onSubmit: Function
+    name: string;
+    processing: boolean;
+    onSubmit: () => void;
 }
 export default function SaveListButton({ name, processing, onSubmit}: Props): JSX.Element {
 

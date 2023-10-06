@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('word_lists', function (Blueprint $table) {
-            $table->foreignId('user_id')->index();
+            $table->unsignedInteger('user_id');
         });
     }
 

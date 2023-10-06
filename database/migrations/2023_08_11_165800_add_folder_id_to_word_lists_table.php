@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('word_lists', function (Blueprint $table) {
             $table->uuid('folder_id')->nullable();
-            $table->foreign('folder_id')->references('id')->on('folders');
           
 
         });
@@ -25,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('word_lists', function (Blueprint $table) {
-            $table->dropForeign(["folder_id"]);
+            $table->dropColumn("folder_id");
         });
     }
 };

@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('word_list_words', function (Blueprint $table) {
             $table->id();
             $table->uuid('word_list_id');
-            $table->foreign('word_list_id')->references('id')->on('word_lists')->onDelete('cascade');
-            $table->foreignId('word_id')->constrained('words')->onDelete('cascade');
+            $table->unsignedInteger('word_id');
             $table->timestamps();
         });
     }

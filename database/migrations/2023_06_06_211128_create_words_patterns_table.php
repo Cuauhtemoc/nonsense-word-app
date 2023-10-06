@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('words_patterns', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('word_id')->constrained('words', 'id');
-            $table->foreignId('pattern_id');
+            $table->unsignedInteger('word_id');
+            $table->unsignedInteger('pattern_id');
             $table->timestamps();
         });
     }

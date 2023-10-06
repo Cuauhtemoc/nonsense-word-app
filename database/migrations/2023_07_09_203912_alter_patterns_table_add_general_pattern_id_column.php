@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('patterns', function (Blueprint $table) {
-            $table->foreignId('general_pattern_id')->after('pattern_name')->nullable()->constrained();
+            $table->unsignedInteger('general_pattern_id')->after('pattern_name')->nullable();
         });
     }
 
@@ -22,7 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('patterns', function (Blueprint $table) {
-            $table->dropForeign(['general_pattern_id']);
             $table->dropColumn('general_pattern_id');
         });
     }

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import WordListTable from './WordListTable';
 import { WordList } from '@/types';

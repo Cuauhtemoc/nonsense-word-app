@@ -13,8 +13,6 @@ return new class extends Migration
     {
         Schema::table('folders', function (Blueprint $table) {
             $table->uuid('parent_id')->nullable();
-            $table->foreign('parent_id')->references('id')->on('folders')->onDelete('cascade');
-
         });
     }
 
@@ -24,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('folders', function (Blueprint $table) {
-            //
+            $table->dropColumn("parent_id");
         });
     }
 };
