@@ -32,8 +32,7 @@
     "sass": "^1.66.1",
     "tailwindcss": "^3.3.2",
     "tsdef": "0.0.14",
-    "typescript": "^5.2.2",
-    "vite": "^3.2.7"
+    "typescript": "^5.2.2"
   },
   "dependencies": {
     "@aperturerobotics/chonky": "^0.2.6",
@@ -54,6 +53,7 @@
     "react-dom": "^18.2.0",
     "react-loader-spinner": "^5.4.5",
     "vite-plugin-live-reload": "^3.0.2",
+    "vite": "^3.2.7",
     "ziggy-js": "^1.6.0"
   },
   "prettier": {
