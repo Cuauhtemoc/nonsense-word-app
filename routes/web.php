@@ -7,7 +7,6 @@ use App\Http\Controllers\WordListController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\WordsController;
 use Inertia\Inertia;
-use Sassnowski\LaravelShareableModel\Shareable\ShareableLink;
 
 /*
 |--------------------------------------------------------------------------
