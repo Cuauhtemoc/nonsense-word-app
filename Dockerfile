@@ -25,4 +25,6 @@ RUN npm install
 
 RUN npm run build
 
+RUN gcloud auth configure-docker us-central1-docker.pkg.dev
+
 CMD sh /app/docker/startup.sh
