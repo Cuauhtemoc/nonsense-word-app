@@ -1,6 +1,8 @@
-FROM php:8.1-fpm-alpine
+FROM google/cloud-sdk:alpine
 
 RUN apk add --no-cache nginx wget
+RUN apk --update add openjdk7-jre
+RUN gcloud components install app-engine-java kubectl
 
 RUN mkdir -p /run/nginx
 
