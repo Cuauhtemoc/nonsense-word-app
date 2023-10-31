@@ -185,7 +185,7 @@ const useCustomFileMap = (fs: CustomFileData, wordList: WordList) => {
     // button. That that we use incremental integer IDs for new folder, but this is
     // not a good practice in production! Instead, you should use something like UUIDs
     // or MD5 hashes for file paths.
-    const createList = useCallback((name: string, words: string[]) => {
+    const createList = useCallback((name: string, words: WordList) => {
         axios.post(route('word-list.store'), { name: name, folder_id: currentFolderIdRef.current, words: words }).then(res => {
 
             setFileMap((currentFileMap: any) => {

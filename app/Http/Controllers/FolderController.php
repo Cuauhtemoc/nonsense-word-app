@@ -11,7 +11,7 @@ class FolderController extends Controller
     {
         // Assuming root folder has a parent_id of null
         $rootFolder = Folder::whereNull('parent_id')->with('wordLists')->first();
-        
+
         $formattedData = $this->formatFolder($rootFolder);
 
         return response()->json([
@@ -32,41 +32,34 @@ class FolderController extends Controller
         foreach ($folder->wordLists as $wordList) {
             $formattedFolder["childrenIds"][] = (string)$wordList->id;
         }
-        
+
         return $formattedFolder;
     }
 
-    private function formatFileOrFolder($item)
-    {
-        return [
-            "id" => $item->id,
-            "name" => $item->name,
-            "parentId" => $item->parent_id,
-            "isDir" => $item->is_directory,
-        ];
-    }
-      /**
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validateWithBag("folder", [
-            'name' => ['required', 'string'],
-            'parent_id' => ['required'],
+        $validatedData = $request->validate([
+            'name' => 'required|string',
+            'parent_id' => 'nullable',
         ]);
-
+    
+        if ($validatedData['parent_id'] === null && Folder::rootFolderExists()) {
+            return response()->json(['error' => 'Root folder already exists.'], 400);
+        }
+    
         $folder = new Folder();
         $folder->name = $validatedData['name'];
         $folder->parent_id = $validatedData['parent_id'];
         $folder->user_id = $request->user()->id;
         $folder->save();
-
-        return response()->json([
-            'folder_id' => (string)$folder->id
-
-        ], 200);
+    
+        return response()->json(['folder_id' => (string) $folder->id], 200);
     }
-       /**
+    
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Folder $folder)
@@ -79,9 +72,8 @@ class FolderController extends Controller
         foreach ($folder->folders as $subFolder) {
             $this->destroy($subFolder);
         }
-    
-            // Delete the current directory
+
+        // Delete the current directory
         $folder->delete();
     }
 }
-

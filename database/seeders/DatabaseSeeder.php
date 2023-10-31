@@ -158,7 +158,6 @@ class DatabaseSeeder extends Seeder
         foreach($patterns as $pattern){
             Word::factory(100)->pattern($pattern->pattern_name)->create(['pattern_id' => $pattern->id]);
         }
-        // Create words based on the dynamic pattern
         
     }
 }

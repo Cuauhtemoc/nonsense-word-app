@@ -13,6 +13,11 @@ class Folder extends Model
 
     protected $fillable = ['name', 'parent_id'];
 
+    public static function rootFolderExists()
+    {
+        return self::whereNull('parent_id')->exists();
+    }
+
     public function wordLists()
     {
         return $this->hasMany(WordList::class);
