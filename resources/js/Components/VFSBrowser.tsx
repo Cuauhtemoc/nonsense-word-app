@@ -8,7 +8,7 @@ import {
 } from '@aperturerobotics/chonky';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CopyShareableLink } from '@/types/custom-actions';
-import { CustomFileData, GeneralPattern, WordList } from '@/types';
+import { CustomFileData, GeneralPattern, WordList, WordPattern } from '@/types';
 import useRoute from '@/Hooks/useRoute';
 import axios from 'axios';
 import CreateWordListForm from '@/Pages/Patterns/Partials/CreateWordListForm';
@@ -44,7 +44,7 @@ const useCustomFileMap = (fs: CustomFileData, wordList: WordList) => {
     const [fileMap, setFileMap] = useState(fs.fileMap);
     const [currentFolderId, setCurrentFolderId] = useState(fs.rootFolderId);
     const [currentWordList, setCurrentWordList] = useState(wordList);
-
+    const [processing, setProcessing] = useState(false);
     //ref for the download pdf button
     const pdfButton = useRef(null);
     // Setup logic to listen to changes in current folder ID without having to update
@@ -185,7 +185,8 @@ const useCustomFileMap = (fs: CustomFileData, wordList: WordList) => {
     // button. That that we use incremental integer IDs for new folder, but this is
     // not a good practice in production! Instead, you should use something like UUIDs
     // or MD5 hashes for file paths.
-    const createList = useCallback((name: string, words: WordList) => {
+    const storeList = useCallback((name: string, words: WordList) => {
+        setProcessing(true);
         axios.post(route('word-list.store'), { name: name, folder_id: currentFolderIdRef.current, words: words }).then(res => {
 
             setFileMap((currentFileMap: any) => {
@@ -202,12 +203,22 @@ const useCustomFileMap = (fs: CustomFileData, wordList: WordList) => {
                     ...parent,
                     childrenIds: [...parent.childrenIds!, newListId],
                 };
-
+                setProcessing(false);
                 return newFileMap;
             });
         })
 
     }, []);
+    const generateList = useCallback((listSize: number, selectedPatterns: string[]) => {
+        setProcessing(true)
+        axios.post(route('word-list.generate'), {
+          patterns: selectedPatterns,
+          listSize: listSize
+        }).then(res => {
+            setCurrentWordList(res.data.wordList);
+            setProcessing(false);
+        });
+      }, [])
     const copyShareableLink = useCallback((wordList: WordList) => {
         navigator.clipboard.writeText(wordList.shareableLink)
 
@@ -218,13 +229,15 @@ const useCustomFileMap = (fs: CustomFileData, wordList: WordList) => {
         currentFolderId,
         currentWordList,
         pdfButton,
+        processing,
         setCurrentFolderId,
         setCurrentWordList,
         deleteFiles,
         moveFiles,
         createFolder,
-        createList,
-        copyShareableLink
+        storeList,
+        copyShareableLink,
+        generateList
     };
 };
 
@@ -336,13 +349,15 @@ export const VFSBrowser: React.FC<VFSProps> = React.memo((props) => {
         fileMap,
         currentFolderId,
         currentWordList,
+        processing,
         setCurrentFolderId,
         setCurrentWordList,
         deleteFiles,
         moveFiles,
         createFolder,
-        createList,
-        copyShareableLink
+        storeList,
+        copyShareableLink,
+        generateList
     } = useCustomFileMap(props.fs, props.wordList);
     const files = useFiles(fileMap, currentFolderId);
     const folderChain = useFolderChain(fileMap, currentFolderId);
@@ -369,12 +384,11 @@ export const VFSBrowser: React.FC<VFSProps> = React.memo((props) => {
                     onFileAction={handleFileAction}
                     disableDefaultFileActions={actionsToDisable}
                     defaultFileViewActionId={"grid"}
-
                     {...props}
                 />
             </div>
             <div className="max-w-7xl mx-auto py-10 sm:px-6 lg:px-8">
-                <CreateWordListForm availablePatterns={props.availablePatterns} wordList={currentWordList} makeList={createList} />
+                <CreateWordListForm processing={processing} availablePatterns={props.availablePatterns} wordList={currentWordList} generateList={generateList} storeList={storeList}/>
             </div>
         </>
 

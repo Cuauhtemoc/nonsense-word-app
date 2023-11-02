@@ -62,7 +62,7 @@ function PatternSelector({ availablePatterns, selectedPatterns, setSelectedPatte
         <div className="col-span-12">
             <InputLabel htmlFor="patterns"><div className='text-center text-lg font-bold underline'>Patterns</div></InputLabel>
             <div className="mt-2 flex justify-center">
-            <div className="mt-2 grid md:lg:grid-cols-4 sm:grid-cols-1 gap-2">
+            <div className="mt-2 grid md:lg:grid-cols-4 sm:grid-cols-4 gap-2">
                 {availablePatterns.map((pattern) => (
                     <div key={pattern.general_pattern_name}>
                         <div className='flex'>

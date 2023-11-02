@@ -20,11 +20,13 @@ import LoadingGrid from "@/Components/LoadingGrid";
 interface Props {
   availablePatterns: GeneralPattern[];
   wordList: WordList;
-  makeList: (name: string, words: WordList) => void
+  processing: boolean;
+  storeList: (name: string, words: WordList) => void
+  generateList: (listSize: number, selectedPatterns: string[]) => void
 }
 
 
-export default function CreatelistForm({ availablePatterns, wordList, makeList }: Props) {
+export default function CreatelistForm({ availablePatterns, wordList, storeList, processing, generateList }: Props) {
 
   const route = useRoute();
   const page = useTypedPage();
@@ -34,33 +36,14 @@ export default function CreatelistForm({ availablePatterns, wordList, makeList }
   const [selectedPatterns, setSelectedPatterns] = useState<string[]>([]);
   const [name, setName] = useState(wordList ? wordList.name : "");
   const [list, setWordList] = useState(wordList);
-  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     setWordList(wordList)
     setName(wordList ? wordList.name : "")
   }, [wordList])
 
-  function showList(): void {
-    setProcessing(true);
-    axios.post(route('word-list.generate'), {
-      patterns: selectedPatterns,
-      listSize: listSize
-    }).then(res => {
-      setWordList(res.data.wordList);
-      setProcessing(false)
-    });
-  }
-  function storeList(): void {
-    setProcessing(true);
-    let data = {
-      name: name,
-      words: JSON.parse(JSON.stringify(list.words)),
-    };
-    makeList(data.name, data.words);
-    setProcessing(false);
-  }
   return (
+
     <>
 
       {processing ?
@@ -90,10 +73,10 @@ export default function CreatelistForm({ availablePatterns, wordList, makeList }
           />
         </div>
         <div className="lg:flex items-center justify-around px-4 py-3 bg-white dark:bg-gray-800 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
-          <ShowListButton processing={processing} patternsSelected={selectedPatterns.length === 0} showList={showList} />
-          <ListSizeOptions setData={setListSize} listSize={listSize} />
-          <FontSizeOptions fontSize={fontSize} setFontSize={setFontSize} />
-          <SaveListButton onSubmit={storeList} processing={processing} name={name} />
+          <ShowListButton processing={processing} selectedPatterns={selectedPatterns} listSize={listSize} generateList={generateList} />
+          <ListSizeOptions setData={setListSize} listSize={listSize} processing={processing} />
+          <FontSizeOptions fontSize={fontSize} setFontSize={setFontSize} processing={processing}  />
+          <SaveListButton onSubmit={storeList} processing={processing} name={name} words={JSON.parse(JSON.stringify(list.words))} />
           <CreatePDFButton wordList={list} fontSize="24px" processing={processing} name={name} />
         </div>
         <PatternSelector availablePatterns={availablePatterns} selectedPatterns={selectedPatterns} setSelectedPatterns={setSelectedPatterns} />
