@@ -3,9 +3,9 @@ import React from 'react';
 import useRoute from '@/Hooks/useRoute';
 import useTypedPage from '@/Hooks/useTypedPage';
 import { Head } from '@inertiajs/react';
-import logo from '../../assets/logo_2.png';
+import logo from '../../assets/logo_icon.png';
 import { ChonkyIconFA } from '@aperturerobotics/chonky-icon-fontawesome';
-import { ChonkyIconContext, ChonkyIconName } from '@aperturerobotics/chonky';
+import { ChonkyIconName } from '@aperturerobotics/chonky';
 
 interface Props {
   canLogin: boolean;
@@ -61,7 +61,9 @@ export default function Welcome({
           <div className="flex justify-center mb-4">
                 <img src={logo} />
           </div>
-
+          <div className="text-center mb-4">
+            <h1 className='text-3xl font-semibold text-gray-900 dark:text-white"'> Phonics Assistant </h1>
+          </div>
           <div >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
               <div
