@@ -11,10 +11,8 @@ import CreatePDFButton from "./CreatePDFButton";
 import SaveListButton from "./SaveListButton";
 import FontSizeOptions from "./FontSizeOptions";
 import ListSizeOptions from "./ListSizeOptions";
-import axios from "axios";
 import ShowListButton from "./ShowListButton";
 import PatternSelector from "./PatternSelector";
-import { Grid } from 'react-loader-spinner'
 import LoadingGrid from "@/Components/LoadingGrid";
 
 interface Props {
