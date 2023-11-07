@@ -76,7 +76,7 @@ export default function CreatelistForm({ availablePatterns, wordList, storeList,
           <ShowListButton processing={processing} selectedPatterns={selectedPatterns} listSize={listSize} generateList={generateList} />
           <ListSizeOptions setData={setListSize} listSize={listSize} processing={processing} />
           <FontSizeOptions fontSize={fontSize} setFontSize={setFontSize} processing={processing}  />
-          <SaveListButton onSubmit={storeList} processing={processing} name={name} words={JSON.parse(JSON.stringify(list.words))} />
+          <SaveListButton onSubmit={storeList} processing={processing} name={name} words={list ?JSON.parse(JSON.stringify(list.words)) : null} />
           <CreatePDFButton wordList={list} fontSize="24px" processing={processing} name={name} />
         </div>
         <PatternSelector availablePatterns={availablePatterns} selectedPatterns={selectedPatterns} setSelectedPatterns={setSelectedPatterns} />
