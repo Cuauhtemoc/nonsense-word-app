@@ -209,11 +209,13 @@ const useCustomFileMap = (fs: CustomFileData, wordList: WordList) => {
         })
 
     }, []);
-    const generateList = useCallback((listSize: number, selectedPatterns: string[]) => {
+    const generateList = useCallback((listSize: number, selectedPatterns: string[], includeRealWords : boolean, includeNonsenseWords: boolean) => {
         setProcessing(true)
         axios.post(route('word-list.generate'), {
           patterns: selectedPatterns,
-          listSize: listSize
+          listSize: listSize,
+          includeRealWords: includeRealWords,
+          includeNonsenseWords: includeNonsenseWords
         }).then(res => {
             setCurrentWordList(res.data.wordList);
             setProcessing(false);

@@ -80,12 +80,12 @@ class WordFactory extends Factory
             "ou" => function () { return $this->generateCVCWord('ou'); },
             "oo" => function () { return $this->generateCVCWord('oo'); },
             "oi" => function () { return $this->generateCVCWord('oi'); },
-            "ew" => function () { return $this->generateCVCWord('ew'); },
-            "aw" => function () { return $this->generateCVCWord('aw'); },
+            "ew" => function () { return $this->generateWordEndingWith('ew'); },
+            "aw" => function () { return $this->generateWordEndingWith('aw'); },
             "au" => function () { return $this->generateCVCWord('au'); },
-            "oy" => function () { return $this->generateCVCWord('oy'); },
-            "y (one syllable, ends in y)" => function () { return $this->generateMultiSyllableWordEndingWith('y', 1); },
-            "y (multi-syllabic, ends in y)" => function () { return $this->generateMultiSyllableWordEndingWith('y', 2); },
+            "oy" => function () { return $this->generateWordEndingWith('oy'); },
+            "y (one syllable, ends in y)" => function () { return $this->generateMultiSyllableWordEndingWith('y', 1, true, true); },
+            "y (multi-syllabic, ends in y)" => function () { return $this->generateMultiSyllableWordEndingWith('y', 2, true, true); },
             "ends with ild" => function () { return $this->generateWordEndingWith('ild', false); },
             "ends with old" => function () { return $this->generateWordEndingWith('old', false); },
             "ends with ind" => function () { return $this->generateWordEndingWith('ind', false); },
@@ -162,37 +162,36 @@ class WordFactory extends Factory
         return $c1 . $longVowel . $c2 . 'e';
     }
     
-
-    private function generateMultiSyllableWordEndingWith(string $ending, int $numSyllables){
-   
+    private function generateMultiSyllableWordEndingWith(string $ending, int $numSyllables, bool $openVowel = false, bool $yAsVowel = false){
         // Ensure words never end with 'h', 'q', 'r', 'w' or a vowel unless "open vowel" is chosen
         $ending = ($ending === 'h' || $ending === 'q' || $ending === 'r' || $ending === 'w' || in_array($ending, ['a', 'e', 'i', 'o', 'u'])) 
-        ? fake()->randomElement(array_diff($this->consonants, ['h', 'q', 'r', 'w'])) 
-        : $ending;
-
+            ? fake()->randomElement(array_diff($this->consonants, ['h', 'q', 'r', 'w'])) 
+            : $ending;
+    
         // Ensure words never end in 'y' unless "y as a vowel" is chosen
-        if ($ending === 'y') {
-            return fake()->randomElement($this->consonants) . fake()->regexify('[aeiou]{1}');
+        if ($ending === 'y' && !$yAsVowel) {
+            return fake()->randomElement($this->consonants) . fake()->randomElement(['a', 'o', 'i', 'u', 'e']);
         }
+    
         // Initialize the word with the first syllable.
-        $word = $this->generateSyllable();
-
+        $word = $this->generateSyllable($openVowel);
+    
         // Generate additional syllables.
         for ($i = 1; $i < $numSyllables; $i++) {
-            $word .= $this->generateSyllable();
+            $word .= $this->generateSyllable($openVowel);
         }
-
-        // Add the ending 'y' to the word.
+    
+        // Add the ending to the word.
         $word .= $ending;
-
+    
         return $word;
     }
-
-    private function generateSyllable(){
+    
+    private function generateSyllable(bool $openVowel = false){
         // Create a simple syllable structure (consonant + vowel).
         $consonant = fake()->randomElement($this->consonants);
-        $vowel = fake()->randomElement(['a', 'o', 'i', 'u', 'e']);
-
+        $vowel = ($openVowel) ? fake()->randomElement(['a', 'o', 'i', 'u', 'e', 'y']) : fake()->randomElement(['a', 'o', 'i', 'u', 'e']);
+    
         return $consonant . $vowel;
     }
 }

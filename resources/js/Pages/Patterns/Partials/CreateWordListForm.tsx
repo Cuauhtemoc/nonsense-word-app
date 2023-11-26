@@ -14,13 +14,14 @@ import ListSizeOptions from "./ListSizeOptions";
 import ShowListButton from "./ShowListButton";
 import PatternSelector from "./PatternSelector";
 import LoadingGrid from "@/Components/LoadingGrid";
+import WordTypeSelector from "./WordTypeSelector";
 
 interface Props {
   availablePatterns: GeneralPattern[];
   wordList: WordList;
   processing: boolean;
   storeList: (name: string, words: WordList) => void
-  generateList: (listSize: number, selectedPatterns: string[]) => void
+  generateList: (listSize: number, selectedPatterns: string[], includeRealWords: boolean, includeNonsenseWords: boolean) => void
 }
 
 
@@ -29,21 +30,23 @@ export default function CreatelistForm({ availablePatterns, wordList, storeList,
   const route = useRoute();
   const page = useTypedPage();
 
+  const [includeRealWords, setIncludeRealWords] = useState(true);
+  const [includeNonsenseWords, setIncludeNonsenseWords] = useState(true);
   const [fontSize, setFontSize] = useState('24px');
   const [listSize, setListSize] = useState(10);
   const [selectedPatterns, setSelectedPatterns] = useState<string[]>([]);
   const [name, setName] = useState(wordList ? wordList.name : "");
   const [list, setWordList] = useState(wordList);
+  const [formEnabled, setFormEnabled] = useState(true);
 
   useEffect(() => {
     setWordList(wordList)
     setName(wordList ? wordList.name : "")
-  }, [wordList])
+    setFormEnabled(includeRealWords || includeNonsenseWords);
+  }, [wordList, includeRealWords, includeNonsenseWords]);
 
   return (
-
     <>
-
       {processing ?
         <div className='align-middle'>
           <LoadingGrid size={listSize} />
@@ -54,8 +57,7 @@ export default function CreatelistForm({ availablePatterns, wordList, storeList,
         />}
       <div>
         <div className="col-span-6 sm:col-span-4">
-
-          <InputLabel htmlFor="name"><div className="mx-4 mt-6 text-xl"> Name: </div></InputLabel>
+          <InputLabel htmlFor="name"><div className="mx-4 mt-6 text-xl"> List name: </div></InputLabel>
           <TextInput
             id="name"
             type="text"
@@ -70,13 +72,20 @@ export default function CreatelistForm({ availablePatterns, wordList, storeList,
             className="mt-2"
           />
         </div>
+        <div></div>
         <div className="lg:flex items-center justify-around px-4 py-3 bg-white dark:bg-gray-800 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
-          <ShowListButton processing={processing} selectedPatterns={selectedPatterns} listSize={listSize} generateList={generateList} />
-          <ListSizeOptions setData={setListSize} listSize={listSize} processing={processing} />
-          <FontSizeOptions fontSize={fontSize} setFontSize={setFontSize} processing={processing}  />
-          <SaveListButton onSubmit={storeList} processing={processing} name={name} words={list ?JSON.parse(JSON.stringify(list.words)) : null} />
-          <CreatePDFButton wordList={list} fontSize="24px" processing={processing} name={name} />
+          <ShowListButton processing={processing || !formEnabled} includeNonsenseWords={includeNonsenseWords} includeRealWords={includeRealWords} selectedPatterns={selectedPatterns} listSize={listSize} generateList={generateList} />
+          <ListSizeOptions setData={setListSize} listSize={listSize} processing={processing || !formEnabled} />
+          <FontSizeOptions fontSize={fontSize} setFontSize={setFontSize} processing={processing || !formEnabled} />
+          <SaveListButton onSubmit={storeList} processing={processing || !formEnabled} name={name} words={list ? JSON.parse(JSON.stringify(list.words)) : null} />
+          <CreatePDFButton wordList={list} fontSize="24px" processing={processing || !formEnabled} name={name} />
         </div>
+        <WordTypeSelector
+          includeRealWords={includeRealWords}
+          includeNonsenseWords={includeNonsenseWords}
+          setIncludeRealWords={setIncludeRealWords}
+          setIncludeNonsenseWords={setIncludeNonsenseWords}
+        />
         <PatternSelector availablePatterns={availablePatterns} selectedPatterns={selectedPatterns} setSelectedPatterns={setSelectedPatterns} />
       </div>
     </>

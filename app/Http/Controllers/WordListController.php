@@ -39,7 +39,6 @@ class WordListController extends Controller
             ],
             "availablePatterns" => GeneralPattern::with('patterns')->get()
         ]);
-    
     }
 
     /**
@@ -49,7 +48,9 @@ class WordListController extends Controller
     {
         $data = $request->validate([
             'patterns' => 'required|array',
-            'listSize' => 'required|integer'
+            'listSize' => 'required|integer',
+            'includeRealWords' => 'required|boolean',
+            'includeNonsenseWords' => 'required|boolean',
         ]);
 
 
@@ -62,11 +63,26 @@ class WordListController extends Controller
         $remainingWords = $totalWords % $patternCount;
 
         foreach ($patternData as $pattern) {
-
             $wordsLimit = $numberOfWordsPerPattern + ($remainingWords > 0 ? 1 : 0);
             $remainingWords--;
-
-            $words = Word::where('pattern_id', '=', $pattern)->inRandomOrder()->limit($wordsLimit)->get();
+        
+            $wordsQuery = Word::query();
+        
+            if ($data['includeRealWords']) {
+                $wordsQuery->orWhere(function ($query) use ($pattern) {
+                    $query->where('pattern_id', '=', $pattern)
+                          ->where('is_real_word', '=', true);
+                });
+            }
+        
+            if ($data['includeNonsenseWords']) {
+                $wordsQuery->orWhere(function ($query) use ($pattern) {
+                    $query->where('pattern_id', '=', $pattern)
+                          ->where('is_real_word', '=', false);
+                });
+            }
+        
+            $words = $wordsQuery->inRandomOrder()->limit($wordsLimit)->get();
             $allWords = array_merge($allWords, $words->toArray());
         }
         shuffle($allWords);
@@ -115,8 +131,9 @@ class WordListController extends Controller
             ->build();
 
         return response()->json(
-            $this->formatWordList($wordList)
-        , 200);
+            $this->formatWordList($wordList),
+            200
+        );
     }
     /**
      * Transform the folder data for Chonky.js 
@@ -167,7 +184,6 @@ class WordListController extends Controller
      */
     public function show(Request $request)
     {
-
     }
     public function showShared(ShareableLink $link)
     {

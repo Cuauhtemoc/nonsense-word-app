@@ -60,7 +60,8 @@ function PatternSelector({ availablePatterns, selectedPatterns, setSelectedPatte
 
     return (
         <div className="col-span-12">
-            <InputLabel htmlFor="patterns"><div className='text-center text-lg font-bold underline'>Patterns</div></InputLabel>
+            <InputLabel htmlFor="patterns"><div className='text-center text-lg font-bold underline'>Select Patterns</div></InputLabel>
+            { selectedPatterns.length === 0 && <div className='text-center text-red-500'>Please select at least one pattern</div>}
             <div className="mt-2 flex justify-center">
             <div className="mt-2 grid md:lg:grid-cols-4 sm:grid-cols-4 gap-2">
                 {availablePatterns.map((pattern) => (

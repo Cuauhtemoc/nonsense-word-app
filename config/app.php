@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'PhonicsPal'),
+    'name' => env('APP_NAME', 'Phonics Assistant'),
 
     /*
     |--------------------------------------------------------------------------
